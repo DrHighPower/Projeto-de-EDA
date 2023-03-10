@@ -104,6 +104,7 @@ int read_transports(Transport* head, int bool) {
 		free(new_transport);
 	}
 	fclose(fp);
+	current->next = NULL;
 
 	return 1;
 }
