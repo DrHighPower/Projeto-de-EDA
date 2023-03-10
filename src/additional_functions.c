@@ -30,7 +30,7 @@ int str_split(char* string, char*** split_string, const char* delim) {
         array_size++;
 
 		// Resize the allocation of memory
-        *split_string = (char**)realloc(*split_string, array_size * sizeof(char*));
+        *split_string = (char**) realloc(*split_string, array_size * sizeof(char*));
         (*split_string)[array_size - 1] = string_dup(token);
         token = strtok(NULL, delim);
     }
