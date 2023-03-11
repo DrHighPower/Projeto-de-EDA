@@ -10,23 +10,32 @@
 #define MAX_LINE_LENGTH 1024
 
 // Traverses the list and frees each node
-void free_user_list(User* head) {
-	User* current = head;
-	while (current != NULL) {
-		User* temp = current;
-		current = current->next;
-		free(temp);
+void free_user_list(User** head) {
+	User* current = *head;
+	User* next;
+
+	while (current->next != NULL) {
+		next = current->next;
+		free(current);
+		current = next;
 	}
-	head = NULL; // Reset the header pointer
+	*head = NULL; // Reset the header pointer
 }
 
-void save_user(User* current, int id, int NIF, float balance, char* name, char* residency, enum UserType type) {
+void save_user(User* current, int id, float balance, char* name, char* residency, char NIF[10], enum UserType type) {
 	current->id = id;
-	current->NIF = NIF;
 	current->balance = balance;
-	current->name = name;
-	current->residency = residency;
+
+	current->name = (char*)malloc(MAX_LINE_LENGTH / 3 * sizeof(char));
+	strcpy(current->name, name);
+
+	current->residency = (char*)malloc(MAX_LINE_LENGTH / 3 * sizeof(char));
+	strcpy(current->residency, residency);
+
+	strcpy(current->NIF, NIF);
+
 	current->type = type;
+	current->next = NULL;
 }
 
 int store_users(User* head, int bool) {
@@ -45,7 +54,7 @@ int store_users(User* head, int bool) {
 
 	// Run through the user list
 	while (current != NULL) {
-		fprintf(fp, "%d;%d;%.2f;%s;%s;%d\n", current->id, current->NIF, current->balance, current->name, current->residency, current->type);
+		fprintf(fp, "%d;%.2f;%s;%s;%s;%d\n", current->id, current->balance, current->name, current->residency, current->NIF, current->type);
 		current = current->next;
 	}
 	fclose(fp);
@@ -53,7 +62,7 @@ int store_users(User* head, int bool) {
 	return 1;
 }
 
-int read_users(User* head, int bool) {
+User* read_users(User* head, int bool) {
 	FILE* fp;
 
 	// Open different files to write
@@ -62,15 +71,15 @@ int read_users(User* head, int bool) {
 
 	if (fp == NULL) {
 		printf("Ocorreu um erro a abrir o ficheiro");
-		return 0;
+		return NULL;
 	}
 
 	char file_info[MAX_LINE_LENGTH];
 	char** split_file_info = NULL;
 
-	// Empties the transport list
-	free_user_list(head);
-	User* current = NULL;
+	// Empties the user list
+	free_user_list(&head);
+	User* current = head;
 
 	// Run through every line
 	while (fgets(file_info, MAX_LINE_LENGTH, fp) != NULL) {
@@ -81,19 +90,19 @@ int read_users(User* head, int bool) {
 		int array_size = str_split(file_info, &split_file_info, ";");
 
 		// Save the line info 
-		User* new_transport = (User*)malloc(sizeof(User));
-		save_user(new_transport,
-			atoi(split_file_info[0]), atoi(split_file_info[1]),
-			atof(split_file_info[2]), split_file_info[3],
+		User* new_user = (User*)malloc(sizeof(User));
+		save_user(new_user,
+			atoi(split_file_info[0]), atof(split_file_info[1]), 
+			split_file_info[2], split_file_info[3], 
 			split_file_info[4], atoi(split_file_info[5]));
 
 		// Add the info into the last node
 		if (current == NULL) {
-			head = new_transport;
+			head = new_user;
 			current = head;
 		}
 		else {
-			current->next = new_transport;
+			current->next = new_user;
 			current = current->next;
 		}
 
@@ -101,9 +110,76 @@ int read_users(User* head, int bool) {
 		for (int i = 0; i < array_size; i++) {
 			free(split_file_info[i]);
 		}
-		free(new_transport);
 	}
 	fclose(fp);
 
-	return 1;
+	return head;
+}
+
+int validate_NIF(char* number) {
+	const int max = 9;
+
+	//Check if is numeric and has 9 digits
+	if (strlen(number) != max) return 0;
+	for (int i = 0; i < max; i++) {
+		if (number[i] < '0' || number[i] > '9') return 0;
+	}
+
+	int check_sum = 0;
+
+	//Calculating check_sum
+	for (int i = 0; i < max - 1; i++) check_sum += (number[i] - '0') * (max - i);
+	int check_digit = 11 - (check_sum % 11);
+
+	// If the check_digit is higher than 9 set it to 0
+	if (check_digit > 9) check_digit = 0;
+
+	// Verify the check_digit with the control digit
+	return check_digit == number[max - 1] - '0';
+}
+
+void insert_user(User** head, int user_type) {
+	User* current = *head;
+
+	char name[MAX_LINE_LENGTH / 3], residency[MAX_LINE_LENGTH / 3], NIF[10];
+
+	// Max size is a third of the max line length
+	printf("Nome:");
+	fgets(name, MAX_LINE_LENGTH / 3, stdin);
+	newline_remove(name);
+
+	// Check if its a possible NIF
+	int valid_nif = 1;
+	do {
+		printf("NIF:");
+		fgets(NIF, 10, stdin);
+		newline_remove(NIF);
+
+		// Throw error message
+		if (validate_NIF(NIF)) valid_nif = 0;
+		else {
+			printf("Ocorreu um erro: NIF invalido\n");
+		}
+	} while (valid_nif);
+	getchar();
+
+	printf("Residencia:");
+	fgets(residency, MAX_LINE_LENGTH / 3, stdin);
+	newline_remove(residency);
+
+	int isFirst = 1;
+
+	// Go to last node in the list
+	while (current->next != NULL) {
+		current = current->next;
+		isFirst = 0;
+	}
+
+	// Check if there is a first node
+	if (isFirst)
+		save_user(current, 1, 0, name, residency, NIF, user_type);
+	else {
+		current->next = (User*)malloc(sizeof(User));
+		save_user(current->next, current->id + 1, 0, name, residency, NIF, user_type);
+	}
 }

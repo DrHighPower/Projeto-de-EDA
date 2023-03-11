@@ -5,6 +5,8 @@ typedef struct transportInformation {
 	struct transportInformation* next;
 } Transport;
 
-void free_transport_list(Transport* head);
+void free_transport_list(Transport** head);
 int store_transports(Transport* head, int bool);
-int read_transports(Transport* head, int bool);
+void save_transport(Transport* current, int id, int battery, int autonomy, float price, char* type, char* geocode);
+Transport* read_transports(Transport* head, int bool);
+void insert_tranport(Transport** head);
