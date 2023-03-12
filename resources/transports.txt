@@ -1,2 +1,3 @@
 1;123;23;10.99;Bike;acabam.gols.durou
 2;22;35;5.00;Your;assa
+3;223;76;22.09;test;test

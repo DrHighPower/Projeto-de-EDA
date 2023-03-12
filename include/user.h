@@ -14,4 +14,6 @@ void save_user(User* current, int id, int NIF, float balance, char* name, char* 
 int store_users(User* head, int bool);
 User* read_users(User* head, int bool);
 int validate_NIF(char* number);
-void insert_user(User** head, int user_type);
+int insert_user(User** head, int user_type);
+int remove_user(User** head, int id);
+int edit_user(User** head, int id);

@@ -45,7 +45,7 @@ int store_transports(Transport* head, int bool) {
 	else fp = fopen("resources/transports.bin", "wb");
 
 	if (fp == NULL) {
-		printf("Ocorreu um erro a abrir o ficheiro");
+		printf("Ocorreu um erro a abrir o ficheiro\n");
 		return 0;
 	}
 
@@ -69,7 +69,7 @@ Transport* read_transports(Transport* head, int bool) {
 	else fp = fopen("resources/transports.bin", "rb");
 
 	if (fp == NULL) {
-		printf("Ocorreu um erro a abrir o ficheiro");
+		printf("Ocorreu um erro a abrir o ficheiro\n");
 		return NULL;
 	}
 
@@ -123,22 +123,22 @@ void insert_tranport(Transport** head) {
 	float price;
 	char type[MAX_LINE_LENGTH / 3], geocode[MAX_LINE_LENGTH / 3];
 
-	printf("Bateria:");
+	printf("Bateria: ");
 	scanf("%d", &battery);
 
-	printf("Autonomia:");
+	printf("Autonomia: ");
 	scanf("%d", &autonomy);
 
-	printf("Preço:");
+	printf("Preço: ");
 	scanf("%f", &price);
 	getchar();
 
 	// Max size is a third of the max line length
-	printf("Tipo:");
+	printf("Tipo: ");
 	fgets(type, MAX_LINE_LENGTH / 3, stdin);
 	newline_remove(type);
 
-	printf("Geocodigo:");
+	printf("Geocódigo: ");
 	fgets(geocode, MAX_LINE_LENGTH / 3, stdin);
 	newline_remove(geocode);
 
@@ -157,4 +157,72 @@ void insert_tranport(Transport** head) {
 		current->next = (Transport*)malloc(sizeof(Transport));
 		save_transport(current->next, current->id + 1, battery, autonomy, price, type, geocode);
 	}
+}
+
+int remove_transport(Transport** head, int id) {
+	Transport* current = *head;
+
+	// Remove the first node
+	if (current->id == id && current != NULL) {
+		*head = current->next;
+		free(current);
+		return 1;
+	}
+
+	Transport* previous = NULL;
+
+	// Remove the midle and last nodes
+	while (current != NULL) {
+		previous = current;
+		current = current->next;
+
+		if (current->id == id) {
+			if (current->next != NULL) previous->next = current->next;
+			else previous->next = NULL;
+
+			free(current);
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int edit_transport(Transport** head, int id) {
+	Transport* current = *head;
+
+	while (current != NULL) {
+		if (current->id == id) {
+			printf("Tipo: %s, Geocódigo: %s, Bateria: %d, Autonomia: %d, Preço: %.2f\n", 
+					current->type, current->geocode, current->battery, current->autonomy, current->price);
+
+			// Max size is a third of the max line length
+			printf("Insira o novo tipo: ");
+			fgets(current->type, MAX_LINE_LENGTH / 3, stdin);
+			newline_remove(current->type);
+
+			printf("Insira o novo geocódigo: ");
+			fgets(current->geocode, MAX_LINE_LENGTH / 3, stdin);
+			newline_remove(current->geocode);
+
+			printf("Insira o nova bateria: ");
+			scanf("%d", &current->battery);
+
+			printf("Insira o nova autonomia: ");
+			scanf("%d", &current->autonomy);
+
+			printf("Insira o novo preço: ");
+			scanf("%f", &current->price);
+			getchar();
+
+			printf("Tipo: %s, Geocódigo: %s, Bateria: %d, Autonomia: %d, Preço: %.2f\n",
+				current->type, current->geocode, current->battery, current->autonomy, current->price);
+
+			return 1;
+		}
+
+		current = current->next;
+	}
+
+	return 0;
 }

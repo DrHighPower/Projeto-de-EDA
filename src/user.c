@@ -46,7 +46,7 @@ int store_users(User* head, int bool) {
 	else fp = fopen("resources/users.bin", "wb");
 
 	if (fp == NULL) {
-		printf("Ocorreu um erro a abrir o ficheiro");
+		printf("Ocorreu um erro a abrir o ficheiro\n");
 		return 0;
 	}
 
@@ -70,7 +70,7 @@ User* read_users(User* head, int bool) {
 	else fp = fopen("resources/users.bin", "rb");
 
 	if (fp == NULL) {
-		printf("Ocorreu um erro a abrir o ficheiro");
+		printf("Ocorreu um erro a abrir o ficheiro\n");
 		return NULL;
 	}
 
@@ -138,20 +138,21 @@ int validate_NIF(char* number) {
 	return check_digit == number[max - 1] - '0';
 }
 
-void insert_user(User** head, int user_type) {
-	User* current = *head;
+int insert_user(User** head, int user_type) {
+	User* current = NULL;
 
+	int id = 0;
 	char name[MAX_LINE_LENGTH / 3], residency[MAX_LINE_LENGTH / 3], NIF[10];
 
 	// Max size is a third of the max line length
-	printf("Nome:");
+	printf("Nome: ");
 	fgets(name, MAX_LINE_LENGTH / 3, stdin);
 	newline_remove(name);
 
 	// Check if its a possible NIF
 	int valid_nif = 1;
 	do {
-		printf("NIF:");
+		printf("NIF: ");
 		fgets(NIF, 10, stdin);
 		newline_remove(NIF);
 
@@ -159,14 +160,31 @@ void insert_user(User** head, int user_type) {
 		if (validate_NIF(NIF)) valid_nif = 0;
 		else {
 			printf("Ocorreu um erro: NIF invalido\n");
+			continue;
+		}
+
+		current = *head;
+
+		// Check if the NIF is already registered
+		while (current != NULL) {
+			if (strcmp(NIF, current->NIF) == 0) {
+				valid_nif = 1;
+
+				printf("Ocorreu um erro: NIF já registado\n");
+				getchar();
+
+				break;
+			}
+			current = current->next;
 		}
 	} while (valid_nif);
 	getchar();
 
-	printf("Residencia:");
+	printf("Residencia: ");
 	fgets(residency, MAX_LINE_LENGTH / 3, stdin);
 	newline_remove(residency);
 
+	current = *head;
 	int isFirst = 1;
 
 	// Go to last node in the list
@@ -176,10 +194,104 @@ void insert_user(User** head, int user_type) {
 	}
 
 	// Check if there is a first node
-	if (isFirst)
-		save_user(current, 1, 0, name, residency, NIF, user_type);
-	else {
+	if (isFirst) {
+		id = 1;
+		save_user(current, id, 0, name, residency, NIF, user_type);
+	}else{
+		id = current->id + 1;
 		current->next = (User*)malloc(sizeof(User));
 		save_user(current->next, current->id + 1, 0, name, residency, NIF, user_type);
 	}
+
+	return id;
+}
+
+int remove_user(User** head, int id) {
+	User* current = *head;
+
+	// Remove the first node
+	if (current->id == id && current != NULL) {
+		*head = current->next;
+		free(current);
+		return 1;
+	}
+
+	User* previous = NULL;
+
+	// Remove the midle and last nodes
+	while (current != NULL) {
+		previous = current;
+		current = current->next;
+
+		if (current->id == id) {
+			if (current->next != NULL) previous->next = current->next;
+			else previous->next = NULL;
+
+			free(current);
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int edit_user(User** head, int id) {
+	User* current = *head;
+
+	while (current != NULL) {
+		if (current->id == id) {
+			printf("Nome: %s, Residencia: %s, NIF: %s\n",
+				current->name, current->residency, current->NIF);
+
+			// Max size is a third of the max line length
+			printf("Insira o novo nome: ");
+			fgets(current->name, MAX_LINE_LENGTH / 3, stdin);
+			newline_remove(current->name);
+
+			printf("Insira o nova residencia: ");
+			fgets(current->residency, MAX_LINE_LENGTH / 3, stdin);
+			newline_remove(current->residency);
+
+			// Check if its a possible NIF
+			int valid_nif = 1;
+			char NIF[10];
+			do {
+				printf("Insira o novo NIF: ");
+				fgets(NIF, 10, stdin);
+				newline_remove(NIF);
+
+				// Throw error message
+				if (validate_NIF(NIF)) valid_nif = 0;
+				else {
+					printf("Ocorreu um erro: NIF invalido\n");
+					continue;
+				}
+
+				User* check = *head;
+
+				// Check if the NIF is already registered
+				while (check != NULL) {
+					if (strcmp(NIF, check->NIF) == 0 && strcmp(NIF, current->NIF) != 0) {
+						valid_nif = 1;
+
+						printf("Ocorreu um erro: NIF já registado\n");
+						getchar();
+
+						break;
+					}
+					check = check->next;
+				}
+			} while (valid_nif);
+			getchar();
+
+			printf("Nome: %s, Residencia: %s, NIF: %s\n",
+				current->name, current->residency, current->NIF);
+
+			return 1;
+		}
+
+		current = current->next;
+	}
+
+	return 0;
 }

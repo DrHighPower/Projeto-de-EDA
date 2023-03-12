@@ -10,3 +10,5 @@ int store_transports(Transport* head, int bool);
 void save_transport(Transport* current, int id, int battery, int autonomy, float price, char* type, char* geocode);
 Transport* read_transports(Transport* head, int bool);
 void insert_tranport(Transport** head);
+int remove_transport(Transport** head, int id);
+int edit_transport(Transport** head, int id);

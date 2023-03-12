@@ -5,6 +5,7 @@
 
 #include "../include/user.h"
 #include "../include/transport.h"
+#include "../include/authentication.h"
 
 int main() {
 	/*Transport* test = (Transport*)malloc(sizeof(Transport));
@@ -12,20 +13,29 @@ int main() {
 
 	test = read_transports(test, 1);
 
-	insert_tranport(&test);
-	*/
+	edit_transport(&test,1);*/
 	
 	User* test = (User*)malloc(sizeof(User));
 	test->next = NULL;
 
 	test = read_users(test, 1);
 
-	insert_user(&test, 0);
-
+	edit_user(&test, 2);
+	
 	while (test != NULL) {
-		printf("%d\n", test->id);
+		printf("%s\n", test->name);
 		test = test->next;
 	}
+
+	/*User* test = (User*)malloc(sizeof(User));
+	test->next = NULL;
+
+	test = read_users(test, 1);
+
+	int id;
+	registers(&test, &id);
+	printf("%d", id);*/
+	
 
 	return 0;
 }
