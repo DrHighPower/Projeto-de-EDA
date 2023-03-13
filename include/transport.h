@@ -12,3 +12,5 @@ Transport* read_transports(Transport* head, int bool);
 void insert_tranport(Transport** head);
 int remove_transport(Transport** head, int id);
 int edit_transport(Transport** head, int id);
+void list_autonomy(Transport* head);
+void list_geocode(Transport* head);

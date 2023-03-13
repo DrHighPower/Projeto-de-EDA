@@ -226,3 +226,74 @@ int edit_transport(Transport** head, int id) {
 
 	return 0;
 }
+
+void list_autonomy(Transport* head) {
+	Transport* current = head;
+
+	// Stores the size of the array for a dynamic array
+	// and saves the quantity of transports
+	int array_size = 2, transport_quant = 0;
+	Transport** array = (Transport*) malloc(array_size * sizeof(Transport));
+
+	while (current != NULL) {
+		array[transport_quant] = current;
+		array_size++;
+
+		// Resizes the array size
+		array = (Transport*) realloc(array, array_size * sizeof(Transport));
+
+		current = current->next;
+		transport_quant++;
+	}
+
+	// Reverse bubble sort throught the array to sort it in descending order of autonomy
+	for (int i = 0; i < transport_quant - 1; i++) {
+		for (int j = 0; j < transport_quant - i - 1; j++) {
+			if (array[j]->autonomy < array[j + 1]->autonomy) {
+				Transport* temp = array[j];
+				array[j] = array[j + 1];
+				array[j + 1] = temp;
+			}
+		}
+	}
+
+	// Prints all the sorted tranports
+	for (int i = 0; i < transport_quant; i++) {
+		printf("Id: %d\n", array[i]->id);
+		printf("Autonomy: %d\n", array[i]->autonomy);
+		printf("Bateria: %d\n", array[i]->battery);
+		printf("Preço: %.2f\n", array[i]->price);
+		printf("Tipo: %s\n", array[i]->type);
+		printf("Geocódigo: %s\n", array[i]->geocode);
+
+		// Print a line until the last one
+		if (i != transport_quant - 1) printf("-------------------------\n");
+	}
+
+	free(array);
+}
+
+void list_geocode(Transport* head) {
+	Transport* current = head;
+	char geocode[MAX_LINE_LENGTH / 3];
+
+	// User input
+	printf("Geocódigo a pesquisar: ");
+	fgets(geocode, MAX_LINE_LENGTH / 3, stdin);
+	newline_remove(geocode);
+
+	while (current != NULL) {
+		if (strcmp(current->geocode, geocode) == 0) {
+			printf("Id: %d\n", current->id);
+			printf("Autonomy: %d\n", current->autonomy);
+			printf("Bateria: %d\n", current->battery);
+			printf("Preço: %.2f\n", current->price);
+			printf("Tipo: %s\n", current->type);
+			printf("Geocódigo: %s\n", current->geocode);
+
+			// Print a line until the last one
+			if (current->next != NULL) printf("-------------------------\n");
+		}
+		current = current->next;
+	}
+}

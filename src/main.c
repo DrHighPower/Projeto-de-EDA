@@ -8,22 +8,22 @@
 #include "../include/authentication.h"
 
 int main() {
-	/*Transport* test = (Transport*)malloc(sizeof(Transport));
+	Transport* test = (Transport*)malloc(sizeof(Transport));
 	test->next = NULL;
 
 	test = read_transports(test, 1);
 
-	edit_transport(&test,1);*/
+	list_geocode(test);
 	
-	User* test = (User*)malloc(sizeof(User));
+	/*User* test = (User*)malloc(sizeof(User));
 	test->next = NULL;
 
 	test = read_users(test, 1);
 
-	edit_user(&test, 2);
+	edit_user(&test, 2);*/
 	
 	while (test != NULL) {
-		printf("%s\n", test->name);
+		printf("%d\n", test->id);
 		test = test->next;
 	}
 
