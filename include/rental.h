@@ -1,0 +1,1 @@
+int store_rental(int user_id, int transport_id, int bool);

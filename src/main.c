@@ -6,14 +6,15 @@
 #include "../include/user.h"
 #include "../include/transport.h"
 #include "../include/authentication.h"
+#include "../include/rental.h"
 
 int main() {
-	Transport* test = (Transport*)malloc(sizeof(Transport));
+	/*Transport* test = (Transport*)malloc(sizeof(Transport));
 	test->next = NULL;
 
 	test = read_transports(test, 1);
 
-	list_geocode(test);
+	list_geocode(test);*/
 	
 	/*User* test = (User*)malloc(sizeof(User));
 	test->next = NULL;
@@ -22,10 +23,10 @@ int main() {
 
 	edit_user(&test, 2);*/
 	
-	while (test != NULL) {
+	/*while (test != NULL) {
 		printf("%d\n", test->id);
 		test = test->next;
-	}
+	}*/
 
 	/*User* test = (User*)malloc(sizeof(User));
 	test->next = NULL;
@@ -36,6 +37,7 @@ int main() {
 	registers(&test, &id);
 	printf("%d", id);*/
 	
+	store_rental(1,1,1);
 
 	return 0;
 }
