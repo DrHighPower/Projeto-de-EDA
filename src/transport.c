@@ -297,3 +297,14 @@ void list_geocode(Transport* head) {
 		current = current->next;
 	}
 }
+
+int validate_transport(Transport* head, int id) {
+	Transport* current = head;
+
+	while (current != NULL) {
+		if (current->id == id) return 1;
+		current = current->next;
+	}
+
+	return 0;
+}

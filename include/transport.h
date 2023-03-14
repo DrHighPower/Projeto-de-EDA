@@ -14,3 +14,4 @@ int remove_transport(Transport** head, int id);
 int edit_transport(Transport** head, int id);
 void list_autonomy(Transport* head);
 void list_geocode(Transport* head);
+int validate_transport(Transport* head, int id);

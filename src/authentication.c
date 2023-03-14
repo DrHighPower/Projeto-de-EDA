@@ -47,6 +47,8 @@ int login(User* head, int *id) {
 	| Registers the user in the list, then it logins the user.
 	|
 */
-int registers(User** head, int* id) {
-	*id = insert_user(head, 0);
+int registers(User** head, int* id, int bool) {
+	*id = insert_user(head, bool);
+
+	return *id;
 }

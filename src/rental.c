@@ -5,8 +5,39 @@
 
 #include "../include/rental.h"
 #include "../include/additional_functions.h"
+#include "../include/transport.h"
+#include "../include/user.h"
 
-int store_rental(int user_id, int transport_id, int bool) {
+int pay_rental(User** head_user, Transport* head_transport, int user_id, int transport_id, int min_used, int bool) {
+	User* current_user = *head_user;
+	Transport* current_transport = head_transport;
+
+	// Get to the position of the respective ids in the lists
+	while (current_user != NULL && current_user->id != user_id) {
+		current_user = current_user->next;
+	}
+	while (current_transport != NULL && current_transport->id != transport_id) {
+		current_transport = current_transport->next;
+	}
+
+	// Save the payment needed
+	float payment = current_transport->price * min_used;
+
+	// Check if the user's balance is enough to make the payment
+	if (current_user->balance > payment) {
+		current_user->balance -= payment;
+
+		store_users(*head_user, bool);
+	}
+	else {
+		printf("Saldo insuficiente!\n");
+		return 0;
+	}
+
+	return 1;
+}
+
+int store_rental(User** head_user, Transport* head_transport, int user_id, int transport_id, int bool) {
 	FILE* fp;
 
 	// Open different files to write
@@ -40,8 +71,13 @@ int store_rental(int user_id, int transport_id, int bool) {
 	char** endDateTimeArray = NULL;
 	str_split(endDateTime, &endDateTimeArray, " ");
 
+	if (!pay_rental(head_user, head_transport, user_id, transport_id, min_used, bool)) {
+		fclose(fp);
+		return 0;
+	}
+
 	fprintf(fp, "%d;%d;%s;%s;%s;%s\n", user_id, transport_id, start_date, start_time, endDateTimeArray[0], endDateTimeArray[1]);
 	fclose(fp);
 
-	return 1;
+	return 0;
 }
