@@ -9,7 +9,7 @@
 #include "../include/authentication.h"
 #include "../include/rental.h"
 
-int manager_menu(User* loaded_users, Transport* loaded_transport) {
+void manager_menu(User* loaded_users, Transport* loaded_transport) {
 	// Variable that stores the user's choice
 	int choice;
 
@@ -160,11 +160,12 @@ int main() {
 		printf("2. Listagem dos meios de mobilidade num geocódigo\n");
 		printf("3. Editar dados do utilizador\n");
 		printf("4. Alugar um meio de transporte\n");
+		printf("5. Adicionar saldo\n");
 
 		// Check if the user is a manager
-		if (user_type) printf("6. Menu de gestores\n");
+		if (user_type) printf("7. Menu de gestores\n");
 
-		printf("5. Sair\n");
+		printf("6. Sair\n");
 		printf("_________________________________\n");
 		printf("Insira a sua escolha: ");
 
@@ -199,8 +200,11 @@ int main() {
 				}
 				break;
 			case 5:
+				add_balance(&loaded_users, id, 0);
 				break;
 			case 6:
+				break;
+			case 7:
 				if (user_type) {
 					manager_menu(loaded_users, loaded_transports);
 					break;
@@ -210,7 +214,7 @@ int main() {
 				printf("Escolha invalida!\n");
 		}
 
-	} while (choice != 5);
+	} while (choice != 6);
 
 	return 0;
 }

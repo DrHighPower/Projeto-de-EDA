@@ -18,3 +18,4 @@ int insert_user(User** head, int user_type);
 int remove_user(User** head, int id);
 int edit_user(User** head, int id);
 int get_user_type(User* head, int id);
+int add_balance(User** head, int id, int bool);

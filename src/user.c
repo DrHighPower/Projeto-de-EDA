@@ -307,3 +307,25 @@ int get_user_type(User* head, int id) {
 
 	return -1;
 }
+
+int add_balance(User** head, int id, int bool) {
+	User* current = *head;
+	float balance_added = 0;
+
+	// Get user's input
+	printf("Quanto a adicionar ao saldo: ");
+	scanf("%f", &balance_added);
+	getchar();
+
+	while (current != NULL) {
+		if (current->id == id) {
+			current->balance += balance_added;
+			store_users(*head, bool);
+			return 1;
+		}
+			
+		current = current->next;
+	}
+
+	return 0;
+}
