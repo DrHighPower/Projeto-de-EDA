@@ -9,6 +9,15 @@
 
 #define MAX_LINE_LENGTH 1024
 
+/*
+	|--------------------------------------------------------------------------
+	| Check NIF
+	|--------------------------------------------------------------------------
+	|
+	| Checks if the NIF exists in the linked list.
+	| Returns the user's id with the same NIF if it exists, else it returns 0
+	|
+*/
 int check_NIF(User* head, char NIF[10]) {
 	User* current = head;
 

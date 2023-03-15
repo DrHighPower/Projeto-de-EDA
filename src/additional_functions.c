@@ -6,13 +6,27 @@
 
 #include "../include/additional_functions.h"
 
+/*
+	|--------------------------------------------------------------------------
+	| String duplication
+	|--------------------------------------------------------------------------
+	|
+	| Returns a duplicated string, an alternative for strdup.
+	|
+*/
 char* string_dup(const char* source) {
-	char* desteny = malloc(strlen(source) + 1);   // Space for length plus null
-	if (desteny == NULL) return NULL;			  // No memory
-	strcpy(desteny, source);                      // Copy the characters
-	return desteny;								  // Return the new string
-}
+	// Space for length plus null
+	char* desteny = malloc(strlen(source) + 1);
+	
+	// Check if it has memory
+	if (desteny == NULL) return NULL;		
 
+	// Copy the characters
+	strcpy(desteny, source);   
+
+	// Return the new string
+	return desteny;
+}
 
 /*
 	|--------------------------------------------------------------------------
@@ -38,7 +52,15 @@ int str_split(char* string, char*** split_string, const char* delim) {
     return array_size;
 }
 
-// Removes the trailing newline character from a string
+
+/*
+	|--------------------------------------------------------------------------
+	| Remove newline
+	|--------------------------------------------------------------------------
+	|
+	| Removes the trailing newline character from a string.
+	|
+*/
 void newline_remove(char* string) {
 	int length = strlen(string);
 

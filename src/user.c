@@ -9,7 +9,15 @@
 
 #define MAX_LINE_LENGTH 1024
 
-// Traverses the list and frees each node
+/*
+	|--------------------------------------------------------------------------
+	| Free the list
+	|--------------------------------------------------------------------------
+	|
+	| Traverses the linked list and frees each node and makes the
+	| the first node NULL.
+	|
+*/
 void free_user_list(User** head) {
 	User* current = *head;
 	User* next;
@@ -22,6 +30,14 @@ void free_user_list(User** head) {
 	*head = NULL; // Reset the header pointer
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Save user
+	|--------------------------------------------------------------------------
+	|
+	| Saves each parameter to its corresponding struct member.
+	|
+*/
 void save_user(User* current, int id, float balance, char* name, char* residency, char NIF[10], enum UserType type) {
 	current->id = id;
 	current->balance = balance;
@@ -38,6 +54,17 @@ void save_user(User* current, int id, float balance, char* name, char* residency
 	current->next = NULL;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Store users
+	|--------------------------------------------------------------------------
+	|
+	| Stores each node of the linked list on a different line in a file.
+	| If the bool parameter is 0 it stores the info inside a binary file,
+	| if the bool parameter is 1 it stores the info inside a text file.
+	| Return a boolean value accordingly.
+	|
+*/
 int store_users(User* head, int bool) {
 	FILE* fp;
 
@@ -62,6 +89,17 @@ int store_users(User* head, int bool) {
 	return 1;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Read users
+	|--------------------------------------------------------------------------
+	|
+	| Reads the users from a file and returns a linked list with each line 
+	| of the file in each node.
+	| If the bool parameter is 0 it reads from the binary file,
+	| if the bool parameter is 1 it reads from the text file.
+	|
+*/
 User* read_users(User* head, int bool) {
 	FILE* fp;
 
@@ -116,6 +154,15 @@ User* read_users(User* head, int bool) {
 	return head;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Vilidate NIF
+	|--------------------------------------------------------------------------
+	|
+	| Verifies if the given parameter is a possible NIF, returning a
+	| boolean accordingly.
+	|
+*/
 int validate_NIF(char* number) {
 	const int max = 9;
 
@@ -138,6 +185,15 @@ int validate_NIF(char* number) {
 	return check_digit == number[max - 1] - '0';
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Insert user
+	|--------------------------------------------------------------------------
+	|
+	| Inserts a new user into the last node of the linked list.
+	| Returns the id of the new user.
+	|
+*/
 int insert_user(User** head, int user_type) {
 	User* current = NULL;
 
@@ -206,6 +262,15 @@ int insert_user(User** head, int user_type) {
 	return id;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Remove user
+	|--------------------------------------------------------------------------
+	|
+	| Removes a user from the given linked list using the given user id.
+	| Returns a boolean value accordingly.
+	|
+*/
 int remove_user(User** head, int id) {
 	User* current = *head;
 
@@ -235,6 +300,15 @@ int remove_user(User** head, int id) {
 	return 0;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Edit user
+	|--------------------------------------------------------------------------
+	|
+	| Edits a user from the given linked list using the given user id.
+	| Returns a boolean value accordingly.
+	|
+*/
 int edit_user(User** head, int id) {
 	User* current = *head;
 
@@ -296,6 +370,14 @@ int edit_user(User** head, int id) {
 	return 0;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Get the user type
+	|--------------------------------------------------------------------------
+	|
+	| Returns the user type by the given id.
+	|
+*/
 int get_user_type(User* head, int id) {
 	User* current = head;
 
@@ -308,6 +390,18 @@ int get_user_type(User* head, int id) {
 	return -1;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Add to balance
+	|--------------------------------------------------------------------------
+	|
+	| Adds a amount to the balance of a user in the linked list 
+	| and in the file.
+	| If the bool parameter is 0 it stores the new balance 
+	| inside a binary file, if the bool parameter is 1 it stores the new 
+	| balance inside a text file.
+	|
+*/
 int add_balance(User** head, int id, int bool) {
 	User* current = *head;
 	float balance_added = 0;

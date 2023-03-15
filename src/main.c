@@ -9,6 +9,14 @@
 #include "../include/authentication.h"
 #include "../include/rental.h"
 
+/*
+	|--------------------------------------------------------------------------
+	| Manager menu
+	|--------------------------------------------------------------------------
+	|
+	| Creates a menu for the users with the manager type
+	|
+*/
 void manager_menu(User* loaded_users, Transport* loaded_transport) {
 	// Variable that stores the user's choice
 	int choice;

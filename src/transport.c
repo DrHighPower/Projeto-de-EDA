@@ -9,7 +9,15 @@
 
 #define MAX_LINE_LENGTH 1024
 
-// Traverses the list and frees each node
+/*
+	|--------------------------------------------------------------------------
+	| Free the list
+	|--------------------------------------------------------------------------
+	|
+	| Traverses the linked list and frees each node and makes the
+	| the first node NULL.
+	|
+*/
 void free_transport_list(Transport** head) {
 	Transport* current = *head;
 	Transport* next;
@@ -22,6 +30,14 @@ void free_transport_list(Transport** head) {
 	*head = NULL; // Reset the header pointer
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Save transport
+	|--------------------------------------------------------------------------
+	|
+	| Saves each parameter to its corresponding struct member.
+	|
+*/
 void save_transport(Transport* current, int id, int battery, int autonomy, float price, char* type, char* geocode) {
 	current->id = id;
 	current->battery = battery;
@@ -37,6 +53,17 @@ void save_transport(Transport* current, int id, int battery, int autonomy, float
 	current->next = NULL;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Store transports
+	|--------------------------------------------------------------------------
+	|
+	| Stores each node of the linked list on a different line in a file.
+	| If the bool parameter is 0 it stores the info inside a binary file,
+	| if the bool parameter is 1 it stores the info inside a text file.
+	| Return a boolean value accordingly.
+	|
+*/
 int store_transports(Transport* head, int bool) {
 	FILE* fp;
 
@@ -61,6 +88,17 @@ int store_transports(Transport* head, int bool) {
 	return 1;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Read transports
+	|--------------------------------------------------------------------------
+	|
+	| Reads the transports from a file and returns a linked list 
+	| with each line of the file in each node.
+	| If the bool parameter is 0 it reads from the binary file,
+	| if the bool parameter is 1 it reads from the text file.
+	|
+*/
 Transport* read_transports(Transport* head, int bool) {
 	FILE* fp;
 
@@ -116,6 +154,14 @@ Transport* read_transports(Transport* head, int bool) {
 	return head;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Insert transport
+	|--------------------------------------------------------------------------
+	|
+	| Inserts a new transport into the last node of the linked list.
+	|
+*/
 void insert_tranport(Transport** head) {
 	Transport* current = *head;
 
@@ -159,6 +205,16 @@ void insert_tranport(Transport** head) {
 	}
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Remove transport
+	|--------------------------------------------------------------------------
+	|
+	| Removes a transport from the given linked list using 
+	| the given transport id.
+	| Returns a boolean value accordingly.
+	|
+*/
 int remove_transport(Transport** head, int id) {
 	Transport* current = *head;
 
@@ -188,6 +244,16 @@ int remove_transport(Transport** head, int id) {
 	return 0;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Edit transport
+	|--------------------------------------------------------------------------
+	|
+	| Edits a transport from the given linked list using 
+	| the given transport id.
+	| Returns a boolean value accordingly.
+	|
+*/
 int edit_transport(Transport** head, int id) {
 	Transport* current = *head;
 
@@ -227,6 +293,14 @@ int edit_transport(Transport** head, int id) {
 	return 0;
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| List of transports by autonomy
+	|--------------------------------------------------------------------------
+	|
+	| Prints a list of transports by descending order of autonomy.
+	|
+*/
 void list_autonomy(Transport* head) {
 	Transport* current = head;
 
@@ -273,6 +347,14 @@ void list_autonomy(Transport* head) {
 	free(array);
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| List of transports with a geocode
+	|--------------------------------------------------------------------------
+	|
+	| Prints a list of transports in a location with a certain geocode. 
+	|
+*/
 void list_geocode(Transport* head) {
 	Transport* current = head;
 	char geocode[MAX_LINE_LENGTH / 3];
@@ -298,6 +380,16 @@ void list_geocode(Transport* head) {
 	}
 }
 
+/*
+	|--------------------------------------------------------------------------
+	| Validate transport
+	|--------------------------------------------------------------------------
+	|
+	| Verifies if the given id matches with a existing transport id in
+	| the linked list.
+	| Return a boolean value accordingly.
+	|
+*/
 int validate_transport(Transport* head, int id) {
 	Transport* current = head;
 

@@ -8,6 +8,19 @@
 #include "../include/transport.h"
 #include "../include/user.h"
 
+/*
+	|--------------------------------------------------------------------------
+	| Pay for the rental
+	|--------------------------------------------------------------------------
+	|
+	| Calculates and makes the payment needed to rent the transport,
+	| changing the users balance in the linked list and in the file.
+	| If the bool parameter is 0 it stores the new balance 
+	| inside a binary file, if the bool parameter is 1 it stores the
+	| new balance inside a text file.
+	| Returns a boolean value accordingly.
+	|
+*/
 int pay_rental(User** head_user, Transport* head_transport, int user_id, int transport_id, int min_used, int bool) {
 	User* current_user = *head_user;
 	Transport* current_transport = head_transport;
@@ -37,6 +50,18 @@ int pay_rental(User** head_user, Transport* head_transport, int user_id, int tra
 	return 1;
 }
 
+
+/*
+	|--------------------------------------------------------------------------
+	| Store the new rental
+	|--------------------------------------------------------------------------
+	|
+	| Makes the process of getting a new rental, storing the renal in a file.
+	| If the bool parameter is 0 it stores the rental inside a binary file, 
+	| if the bool parameter is 1 it stores the rental inside a text file.
+	| Returns a boolean value accordingly.
+	|
+*/
 int store_rental(User** head_user, Transport* head_transport, int user_id, int transport_id, int bool) {
 	FILE* fp;
 
