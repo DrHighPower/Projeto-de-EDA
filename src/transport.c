@@ -14,7 +14,7 @@
 	| Free the list
 	|--------------------------------------------------------------------------
 	|
-	| Traverses the linked list and frees each node and makes the
+	| Traverses the linked list and frees each node and makes
 	| the first node NULL.
 	|
 */

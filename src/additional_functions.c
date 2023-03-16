@@ -11,7 +11,7 @@
 	| String duplication
 	|--------------------------------------------------------------------------
 	|
-	| Returns a duplicated string, an alternative for strdup.
+	| Returns a pointer of a duplicated string, an alternative for strdup.
 	|
 */
 char* string_dup(const char* source) {
@@ -52,7 +52,6 @@ int str_split(char* string, char*** split_string, const char* delim) {
     return array_size;
 }
 
-
 /*
 	|--------------------------------------------------------------------------
 	| Remove newline
@@ -74,7 +73,7 @@ void newline_remove(char* string) {
 	| Add minutes to time
 	|--------------------------------------------------------------------------
 	|
-	| The functions returns the sum of minutes to a given time.
+	| The function returns the sum of minutes to a given time.
 	| It will also change the date if needed.
 	|
 */

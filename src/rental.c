@@ -56,7 +56,7 @@ int pay_rental(User** head_user, Transport* head_transport, int user_id, int tra
 	| Store the new rental
 	|--------------------------------------------------------------------------
 	|
-	| Makes the process of getting a new rental, storing the renal in a file.
+	| Makes the process of getting a new rental, storing the rental in a file.
 	| If the bool parameter is 0 it stores the rental inside a binary file, 
 	| if the bool parameter is 1 it stores the rental inside a text file.
 	| Returns a boolean value accordingly.
@@ -104,5 +104,5 @@ int store_rental(User** head_user, Transport* head_transport, int user_id, int t
 	fprintf(fp, "%d;%d;%s;%s;%s;%s\n", user_id, transport_id, start_date, start_time, endDateTimeArray[0], endDateTimeArray[1]);
 	fclose(fp);
 
-	return 0;
+	return 1;
 }
