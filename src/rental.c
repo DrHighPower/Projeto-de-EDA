@@ -104,5 +104,7 @@ int store_rental(User** head_user, Transport* head_transport, int user_id, int t
 	fprintf(fp, "%d;%d;%s;%s;%s;%s\n", user_id, transport_id, start_date, start_time, endDateTimeArray[0], endDateTimeArray[1]);
 	fclose(fp);
 
+	free(endDateTimeArray);
+
 	return 1;
 }
