@@ -8,6 +8,7 @@
 #include "../include/additional_functions.h"
 
 #define MAX_LINE_LENGTH 1024
+#define MAX_PASSWORD_SIZE 21
 
 /*
 	|--------------------------------------------------------------------------
@@ -38,7 +39,7 @@ void free_user_list(User** head) {
 	| Saves each parameter to its corresponding struct member.
 	|
 */
-void save_user(User* current, int id, float balance, char* name, char* residency, char NIF[10], enum UserType type) {
+void save_user(User* current, int id, float balance, char* name, char* residency, char* NIF, char* password, enum UserType type) {
 	current->id = id;
 	current->balance = balance;
 
@@ -49,6 +50,9 @@ void save_user(User* current, int id, float balance, char* name, char* residency
 	strcpy(current->residency, residency);
 
 	strcpy(current->NIF, NIF);
+
+	current->password = (char*)malloc(MAX_PASSWORD_SIZE * sizeof(char));
+	strcpy(current->password, password);
 
 	current->type = type;
 	current->next = NULL;
@@ -81,7 +85,7 @@ int store_users(User* head, int bool) {
 
 	// Run through the user list
 	while (current != NULL) {
-		fprintf(fp, "%d;%.2f;%s;%s;%s;%d\n", current->id, current->balance, current->name, current->residency, current->NIF, current->type);
+		fprintf(fp, "%d;%.2f;%s;%s;%s;%s;%d\n", current->id, current->balance, current->name, current->residency, current->NIF, current->password,current->type);
 		current = current->next;
 	}
 	fclose(fp);
@@ -132,7 +136,8 @@ User* read_users(User* head, int bool) {
 		save_user(new_user,
 			atoi(split_file_info[0]), atof(split_file_info[1]), 
 			split_file_info[2], split_file_info[3], 
-			split_file_info[4], atoi(split_file_info[5]));
+			split_file_info[4], split_file_info[5], 
+			atoi(split_file_info[6]));
 
 		// Add the info into the last node
 		if (current == NULL) {
@@ -198,7 +203,7 @@ int insert_user(User** head, int user_type) {
 	User* current = NULL;
 
 	int id = 0;
-	char name[MAX_LINE_LENGTH / 3], residency[MAX_LINE_LENGTH / 3], NIF[10];
+	char name[MAX_LINE_LENGTH / 3], residency[MAX_LINE_LENGTH / 3], NIF[10], password[MAX_PASSWORD_SIZE], re_password[MAX_PASSWORD_SIZE];
 
 	// Max size is a third of the max line length
 	printf("Nome: ");
@@ -240,6 +245,20 @@ int insert_user(User** head, int user_type) {
 	fgets(residency, MAX_LINE_LENGTH / 3, stdin);
 	newline_remove(residency);
 
+	int correct_password = 1;
+	do {
+		printf("Password: ");
+		fgets(password, MAX_PASSWORD_SIZE, stdin);
+		newline_remove(password);
+
+		printf("Reintroduzir a password: ");
+		fgets(re_password, MAX_PASSWORD_SIZE, stdin);
+		newline_remove(re_password);
+
+		if (strcmp(password, re_password) == 0) correct_password = 0;
+		else printf("As passwords não correspondem!\n");
+	} while (correct_password);
+
 	current = *head;
 	int isFirst = 1;
 
@@ -252,11 +271,11 @@ int insert_user(User** head, int user_type) {
 	// Check if there is a first node
 	if (isFirst) {
 		id = 1;
-		save_user(current, id, 0, name, residency, NIF, user_type);
+		save_user(current, id, 0, name, residency, NIF, password,user_type);
 	}else{
 		id = current->id + 1;
 		current->next = (User*)malloc(sizeof(User));
-		save_user(current->next, current->id + 1, 0, name, residency, NIF, user_type);
+		save_user(current->next, current->id + 1, 0, name, residency, NIF, password,user_type);
 	}
 
 	return id;

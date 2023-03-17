@@ -27,7 +27,8 @@ typedef struct userInformation {
 	float balance;						/**< O saldo do utilizador. */
 	char *name,							/**< O nome do utilizador. */
 		*residency,						/**< O endereço da morada do utilizador. */
-		NIF[10];						/**< O Número de Identificação Fiscal do utilizador. */
+		NIF[10],						/**< O Número de Identificação Fiscal do utilizador. */
+		*password;						
 	enum UserType type;					/**< O nivel de acesso do utilizador. */
 	struct userInformation* next;		/**< O endereço do próximo nó da lista ligada. */
 } User;
@@ -50,9 +51,10 @@ void free_user_list(User** head);
  * @param name O nome a ser guardado.
  * @param residency A morada a ser guardada.
  * @param NIF O Número de Identificação Fiscal a ser guardado.
+ * @param password A password a ser guardada.
  * @param type O nivel de acesso a ser guardado.
  */
-void save_user(User* current, int id, float balance, char* name, char* residency, char NIF[10], enum UserType type);
+void save_user(User* current, int id, float balance, char* name, char* residency, char* NIF, char* password, enum UserType type);
 
 /**
  * @brief Armazena os utilizadores num ficheiro.

@@ -136,7 +136,7 @@ int main() {
 		switch (choice) {
 		case 1:
 			if (login(loaded_users, &id)) bool = 0;
-			else printf("Utilizador não encontrado.\n\n");
+			else printf("Utilizador não encontrado ou password errada.\n\n");
 			break;
 		case 2:
 			if (registers(&loaded_users, &id, 0)) {
@@ -223,6 +223,6 @@ int main() {
 		}
 
 	} while (choice != 6);
-
+	
 	return 0;
 }

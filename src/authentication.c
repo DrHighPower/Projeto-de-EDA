@@ -6,8 +6,9 @@
 
 #include "../include/authentication.h"
 #include "../include/user.h"
+#include "../include/additional_functions.h"
 
-#define MAX_LINE_LENGTH 1024
+#define MAX_PASSWORD_SIZE 20
 
 /*
 	|--------------------------------------------------------------------------
@@ -31,6 +32,26 @@ int check_NIF(User* head, char NIF[10]) {
 
 /*
 	|--------------------------------------------------------------------------
+	| Check password
+	|--------------------------------------------------------------------------
+	|
+	| Check if the user inputed the right password.
+	| Returns the user's id if the password is correct, else it returns 0.
+	|
+*/
+int check_password(User* head, int id,char *password) {
+	User* current = head;
+
+	while (current != NULL && id != 0) {
+		if(current->id == id && strcmp(password, current->password) == 0) return current->id;
+		current = current->next;
+	}
+
+	return 0;
+}
+
+/*
+	|--------------------------------------------------------------------------
 	| Login
 	|--------------------------------------------------------------------------
 	|
@@ -42,9 +63,15 @@ int login(User* head, int *id) {
 	char NIF[10];
 	printf("Introduza o seu NIF: ");
 	fgets(NIF, 10, stdin);
+	getchar();
 
-	// Get the id corresponding to a NIF
-	*id = check_NIF(head, NIF);
+	char password[MAX_PASSWORD_SIZE];
+	printf("Introduza a sua password: ");
+	fgets(password, MAX_PASSWORD_SIZE, stdin);
+	newline_remove(password);
+
+	// Check the NIF and password
+	*id = check_password(head, check_NIF(head, NIF), password);
 	return *id;
 }
 

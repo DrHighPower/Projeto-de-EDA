@@ -20,6 +20,17 @@ typedef struct userInformation User;
 int check_NIF(User* head, char NIF[10]);
 
 /**
+ * @brief Verifica se a password introduzida está correta.
+ *
+ * @param head A lista ligada a ser percorrida.
+ * @param id O código do utilizador a verificar a password.
+ * @param password A password a ser verificada.
+ *
+ * @return Se a password estiver correta é devolvida o código do utilizador, se não é devolvido 0.
+ */
+int check_password(User* head, int id, char* password);
+
+/**
  * @brief Faz o login do utilizador salvando o seu código numa variável.
  *
  * @param head A lista ligada a ser percorrida.
@@ -28,6 +39,7 @@ int check_NIF(User* head, char NIF[10]);
  * @return O código do utilizador, se a operação não for bem sucedida devolve 0.
  * 
  * @see check_NIF
+ * @see check_password
  * @see registers
  */
 int login(User* head, int* id);
