@@ -1,4 +1,16 @@
 /**
+ * @mainpage Documentação
+ * 
+ * @subsection description Descrição
+ * Este projeto foi realizado no âmbito da disciplina de Estruturas de Dados Anvançadas, ele tem como objetivo ser uma solução de software que permita acelarar a gestão de meios de mobilidade.\n
+ * Como pedido o código utiliza estruturas de dados dinâmicas,armazenamento em ficheiro, etc.
+ * Este também utiliza uma estandardização no estilo do código, tentando ser o mais proximo ao <em> <a href="https://www.kernel.org/doc/html/v4.10/process/coding-style.html">Linux kernel coding style</a> </em>, possuindo algumas diferenças por escolha própria.\n
+ * O projeto utiliza o <a href="https://github.com/DrHighPower/Projeto-de-EDA">GitHub</a> como ferramenta de controlo de versões.
+ * 
+ * @author João Telmo Barros Inverneiro
+ */
+
+/**
  * @file additional_functions.h
  * @brief É o ficheiro que contém as difinições necessárias para funções utilizadas no projeto.
  *
