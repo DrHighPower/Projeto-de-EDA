@@ -6,6 +6,7 @@
 
 #include "../include/additional_functions.h"
 
+#pragma region StringDup
 /*
 	|--------------------------------------------------------------------------
 	| String duplication
@@ -27,7 +28,9 @@ char* string_dup(const char* source) {
 	// Return the new string
 	return desteny;
 }
+#pragma endregion
 
+#pragma region StrSplit
 /*
 	|--------------------------------------------------------------------------
 	| Split string
@@ -51,7 +54,9 @@ int str_split(char* string, char*** split_string, const char* delim) {
 
     return array_size;
 }
+#pragma endregion
 
+#pragma region NewlineRemove
 /*
 	|--------------------------------------------------------------------------
 	| Remove newline
@@ -67,7 +72,9 @@ void newline_remove(char* string) {
 		string[length - 1] = '\0';
 	}
 }
+#pragma endregion
 
+#pragma region AddMinutes
 /*
 	|--------------------------------------------------------------------------
 	| Add minutes to time
@@ -131,3 +138,4 @@ char* add_minutes(const char* time, const char* date, int minutes) {
 	sprintf(new_time_date, "%s %s", new_date, new_time);
 	return new_time_date;
 }
+#pragma endregion

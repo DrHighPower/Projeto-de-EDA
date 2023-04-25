@@ -9,6 +9,7 @@
 #include "../include/authentication.h"
 #include "../include/rental.h"
 
+#pragma region ManagerMenu
 /*
 	|--------------------------------------------------------------------------
 	| Manager menu
@@ -100,7 +101,9 @@ void manager_menu(User* loaded_users, Transport* loaded_transport) {
 
 	} while (choice != 7);
 }
+#pragma endregion
 
+#pragma region Main
 int main() {
 	setlocale(LC_ALL, "Portuguese");
 	setlocale(LC_NUMERIC, "English"); // Effects the decimal point formatting so its "." and not ","
@@ -184,10 +187,46 @@ int main() {
 
 		switch (choice) {
 			case 1:
-				list_autonomy(loaded_transports);
+				{
+					int transport_quant;
+					Transport** autonomy_array = list_autonomy(loaded_transports, &transport_quant);
+
+					// Prints all the sorted tranports
+					for (int i = 0; i < transport_quant; i++) {
+						printf("Id: %d\n", autonomy_array[i]->id);
+						printf("Autonomy: %d\n", autonomy_array[i]->autonomy);
+						printf("Bateria: %d\n", autonomy_array[i]->battery);
+						printf("Preço: %.2f\n", autonomy_array[i]->price);
+						printf("Tipo: %s\n", autonomy_array[i]->type);
+						printf("Geocódigo: %s\n", autonomy_array[i]->geocode);
+
+						// Print a line until the last one
+						if (i != transport_quant - 1) printf("-------------------------\n");
+					}
+
+					free(autonomy_array);
+				}
 				break;
 			case 2:
-				list_geocode(loaded_transports);
+				{
+					int transport_quant;
+					Transport** geocode_array = list_geocode(loaded_transports, &transport_quant);
+
+					// Prints all the sorted tranports
+					for (int i = 0; i < transport_quant; i++) {
+						printf("Id: %d\n", geocode_array[i]->id);
+						printf("Autonomy: %d\n", geocode_array[i]->autonomy);
+						printf("Bateria: %d\n", geocode_array[i]->battery);
+						printf("Preço: %.2f\n", geocode_array[i]->price);
+						printf("Tipo: %s\n", geocode_array[i]->type);
+						printf("Geocódigo: %s\n", geocode_array[i]->geocode);
+
+						// Print a line until the last one
+						if (i != transport_quant - 1) printf("-------------------------\n");
+					}
+
+					free(geocode_array);
+				}
 				break;
 			case 3:
 				edit_user(&loaded_users, id);
@@ -226,3 +265,4 @@ int main() {
 	
 	return 0;
 }
+#pragma endregion

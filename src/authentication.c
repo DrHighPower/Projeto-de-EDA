@@ -10,6 +10,7 @@
 
 #define MAX_PASSWORD_SIZE 20
 
+#pragma region CheckNIF
 /*
 	|--------------------------------------------------------------------------
 	| Check NIF
@@ -29,7 +30,9 @@ int check_NIF(User* head, char NIF[10]) {
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region CheckPassword
 /*
 	|--------------------------------------------------------------------------
 	| Check password
@@ -49,7 +52,9 @@ int check_password(User* head, int id,char *password) {
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region Login
 /*
 	|--------------------------------------------------------------------------
 	| Login
@@ -74,7 +79,9 @@ int login(User* head, int *id) {
 	*id = check_password(head, check_NIF(head, NIF), password);
 	return *id;
 }
+#pragma endregion
 
+#pragma region Register
 /*
 	|--------------------------------------------------------------------------
 	| Register
@@ -88,3 +95,4 @@ int registers(User** head, int* id, int bool) {
 
 	return *id;
 }
+#pragma endregion

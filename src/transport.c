@@ -9,6 +9,7 @@
 
 #define MAX_LINE_LENGTH 1024
 
+#pragma region FreeTransportList
 /*
 	|--------------------------------------------------------------------------
 	| Free the list
@@ -29,7 +30,9 @@ void free_transport_list(Transport** head) {
 	}
 	*head = NULL; // Reset the header pointer
 }
+#pragma endregion
 
+#pragma region SaveTransport
 /*
 	|--------------------------------------------------------------------------
 	| Save transport
@@ -52,7 +55,9 @@ void save_transport(Transport* current, int id, int battery, int autonomy, float
 
 	current->next = NULL;
 }
+#pragma endregion
 
+#pragma region StoreTransports
 /*
 	|--------------------------------------------------------------------------
 	| Store transports
@@ -87,7 +92,9 @@ int store_transports(Transport* head, int bool) {
 
 	return 1;
 }
+#pragma endregion
 
+#pragma region ReadTransports
 /*
 	|--------------------------------------------------------------------------
 	| Read transports
@@ -153,7 +160,9 @@ Transport* read_transports(Transport* head, int bool) {
 
 	return head;
 }
+#pragma endregion
 
+#pragma region InsertTransport
 /*
 	|--------------------------------------------------------------------------
 	| Insert transport
@@ -204,7 +213,9 @@ void insert_tranport(Transport** head) {
 		save_transport(current->next, current->id + 1, battery, autonomy, price, type, geocode);
 	}
 }
+#pragma endregion
 
+#pragma region RemoveTransport
 /*
 	|--------------------------------------------------------------------------
 	| Remove transport
@@ -243,7 +254,9 @@ int remove_transport(Transport** head, int id) {
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region EditTransport
 /*
 	|--------------------------------------------------------------------------
 	| Edit transport
@@ -292,37 +305,40 @@ int edit_transport(Transport** head, int id) {
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region ListAutonomy
 /*
 	|--------------------------------------------------------------------------
 	| List of transports by autonomy
 	|--------------------------------------------------------------------------
 	|
-	| Prints a list of transports by descending order of autonomy.
+	| Returns a list of transports by descending order of autonomy.
 	|
 */
-void list_autonomy(Transport* head) {
+Transport** list_autonomy(Transport* head, int* transport_quant) {
 	Transport* current = head;
 
 	// Stores the size of the array for a dynamic array
 	// and saves the quantity of transports
-	int array_size = 2, transport_quant = 0;
+	*transport_quant = 0;
+	int array_size = 2;
 	Transport** array = (Transport*) malloc(array_size * sizeof(Transport));
 
 	while (current != NULL) {
-		array[transport_quant] = current;
+		array[*transport_quant] = current;
 		array_size++;
 
 		// Resizes the array size
 		array = (Transport*) realloc(array, array_size * sizeof(Transport));
 
 		current = current->next;
-		transport_quant++;
+		*transport_quant = *transport_quant + 1;
 	}
 
 	// Reverse bubble sort throught the array to sort it in descending order of autonomy
-	for (int i = 0; i < transport_quant - 1; i++) {
-		for (int j = 0; j < transport_quant - i - 1; j++) {
+	for (int i = 0; i < *transport_quant - 1; i++) {
+		for (int j = 0; j < *transport_quant - i - 1; j++) {
 			if (array[j]->autonomy < array[j + 1]->autonomy) {
 				Transport* temp = array[j];
 				array[j] = array[j + 1];
@@ -331,22 +347,11 @@ void list_autonomy(Transport* head) {
 		}
 	}
 
-	// Prints all the sorted tranports
-	for (int i = 0; i < transport_quant; i++) {
-		printf("Id: %d\n", array[i]->id);
-		printf("Autonomy: %d\n", array[i]->autonomy);
-		printf("Bateria: %d\n", array[i]->battery);
-		printf("Preço: %.2f\n", array[i]->price);
-		printf("Tipo: %s\n", array[i]->type);
-		printf("Geocódigo: %s\n", array[i]->geocode);
-
-		// Print a line until the last one
-		if (i != transport_quant - 1) printf("-------------------------\n");
-	}
-
-	free(array);
+	return array;
 }
+#pragma endregion
 
+#pragma region ListGeocode
 /*
 	|--------------------------------------------------------------------------
 	| List of transports with a geocode
@@ -355,7 +360,7 @@ void list_autonomy(Transport* head) {
 	| Prints a list of transports in a location with a certain geocode. 
 	|
 */
-void list_geocode(Transport* head) {
+Transport** list_geocode(Transport* head, int* transport_quant) {
 	Transport* current = head;
 	char geocode[MAX_LINE_LENGTH / 3];
 
@@ -364,22 +369,29 @@ void list_geocode(Transport* head) {
 	fgets(geocode, MAX_LINE_LENGTH / 3, stdin);
 	newline_remove(geocode);
 
+	// Stores the size of the array for a dynamic array
+	// and saves the quantity of transports
+	*transport_quant = 0;
+	int array_size = 2;
+	Transport** array = (Transport*)malloc(array_size * sizeof(Transport));
+
 	while (current != NULL) {
 		if (strcmp(current->geocode, geocode) == 0) {
-			printf("Id: %d\n", current->id);
-			printf("Autonomy: %d\n", current->autonomy);
-			printf("Bateria: %d\n", current->battery);
-			printf("Preço: %.2f\n", current->price);
-			printf("Tipo: %s\n", current->type);
-			printf("Geocódigo: %s\n", current->geocode);
+			array[*transport_quant] = current;
+			array_size++;
 
-			// Print a line until the last one
-			if (current->next != NULL) printf("-------------------------\n");
+			// Resizes the array size
+			array = (Transport*)realloc(array, array_size * sizeof(Transport));
+			*transport_quant = *transport_quant + 1;
 		}
 		current = current->next;
 	}
-}
 
+	return array;
+}
+#pragma endregion
+
+#pragma region ValidateTransport
 /*
 	|--------------------------------------------------------------------------
 	| Validate transport
@@ -400,3 +412,4 @@ int validate_transport(Transport* head, int id) {
 
 	return 0;
 }
+#pragma endregion

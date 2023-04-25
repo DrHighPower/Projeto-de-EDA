@@ -10,6 +10,7 @@
 #define MAX_LINE_LENGTH 1024
 #define MAX_PASSWORD_SIZE 21
 
+#pragma region FreeUserList
 /*
 	|--------------------------------------------------------------------------
 	| Free the list
@@ -30,7 +31,9 @@ void free_user_list(User** head) {
 	}
 	*head = NULL; // Reset the header pointer
 }
+#pragma endregion
 
+#pragma region SaveUser
 /*
 	|--------------------------------------------------------------------------
 	| Save user
@@ -57,7 +60,9 @@ void save_user(User* current, int id, float balance, char* name, char* residency
 	current->type = type;
 	current->next = NULL;
 }
+#pragma endregion
 
+#pragma region StoreUsers
 /*
 	|--------------------------------------------------------------------------
 	| Store users
@@ -92,7 +97,9 @@ int store_users(User* head, int bool) {
 
 	return 1;
 }
+#pragma endregion
 
+#pragma region ReadUsers
 /*
 	|--------------------------------------------------------------------------
 	| Read users
@@ -158,7 +165,9 @@ User* read_users(User* head, int bool) {
 
 	return head;
 }
+#pragma endregion
 
+#pragma region ValidateNIF
 /*
 	|--------------------------------------------------------------------------
 	| Vilidate NIF
@@ -189,7 +198,9 @@ int validate_NIF(char* number) {
 	// Verify the check_digit with the control digit
 	return check_digit == number[max - 1] - '0';
 }
+#pragma endregion
 
+#pragma region InsertUser
 /*
 	|--------------------------------------------------------------------------
 	| Insert user
@@ -280,7 +291,9 @@ int insert_user(User** head, int user_type) {
 
 	return id;
 }
+#pragma endregion
 
+#pragma region RemoveUser
 /*
 	|--------------------------------------------------------------------------
 	| Remove user
@@ -318,7 +331,9 @@ int remove_user(User** head, int id) {
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region EditUser
 /*
 	|--------------------------------------------------------------------------
 	| Edit user
@@ -388,7 +403,9 @@ int edit_user(User** head, int id) {
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region GetUserType
 /*
 	|--------------------------------------------------------------------------
 	| Get the user type
@@ -408,7 +425,9 @@ int get_user_type(User* head, int id) {
 
 	return -1;
 }
+#pragma endregion
 
+#pragma region AddBalance
 /*
 	|--------------------------------------------------------------------------
 	| Add to balance
@@ -442,3 +461,4 @@ int add_balance(User** head, int id, int bool) {
 
 	return 0;
 }
+#pragma endregion

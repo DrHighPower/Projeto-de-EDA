@@ -120,22 +120,24 @@ int remove_transport(Transport** head, int id);
 int edit_transport(Transport** head, int id);
 
 /**
- * @brief Imprime uma lista de transportes por ordem decrescente de autonomia.
+ * @brief Retorna uma lista de transportes por ordem decrescente de autonomia.
  *
- * @param head A lista ligada a ser imprimida.
+ * @param head A lista ligada a ser retornada.
+ * @param transport_quant Quantidade de transportes.
  * 
  * @see list_geocode
  */
-void list_autonomy(Transport* head);
+Transport** list_autonomy(Transport* head, int* transport_quant);
 
 /**
- * @brief Imprime uma lista de transportes em um local com um determinado geocódigo.
+ * @brief Retorna uma lista de transportes em um local com um determinado geocódigo.
  *
- * @param head A lista ligada a ser imprimida.
+ * @param head A lista ligada a ser retornada.
+ * @param transport_quant Quantidade de transportes.
  *
  * @see list_autonomy
  */
-void list_geocode(Transport* head);
+Transport** list_geocode(Transport* head, int* transport_quant);
 
 /**
  * @brief Verifica a existência de um meio de transporte.

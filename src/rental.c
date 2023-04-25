@@ -8,6 +8,8 @@
 #include "../include/transport.h"
 #include "../include/user.h"
 
+
+#pragma region PayRental
 /*
 	|--------------------------------------------------------------------------
 	| Pay for the rental
@@ -49,8 +51,9 @@ int pay_rental(User** head_user, Transport* head_transport, int user_id, int tra
 
 	return 1;
 }
+#pragma endregion
 
-
+#pragma region StoreRental
 /*
 	|--------------------------------------------------------------------------
 	| Store the new rental
@@ -108,3 +111,4 @@ int store_rental(User** head_user, Transport* head_transport, int user_id, int t
 
 	return 1;
 }
+#pragma endregion
