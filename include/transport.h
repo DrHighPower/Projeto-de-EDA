@@ -17,9 +17,10 @@ typedef struct transportInformation {
 	int id,								/**< O código unico de cada meio de transporte. */
 		battery,						/**< A bateria do meio de transporte. */
 		autonomy;						/**< A autonomia do meio de transporte. */
-	float price;						/**< O preço do meio de transporte. */
+	float price,						/**< O preço do meio de transporte. */
+		  volume;						/**< O volume do meio de transporte em metros cúbicos. */
 	char *type,							/**< O tipo do meio de transporte. */
-		*geocode;						/**< O geocódigo do meio de transporte. */
+		 *geocode;						/**< O geocódigo do meio de transporte. */
 	struct transportInformation* next;	/**< O endereço do próximo nó da lista ligada. */
 } Transport;
 
@@ -40,10 +41,11 @@ void free_transport_list(Transport** head);
  * @param battery A bateria a ser guardada.
  * @param autonomy A autonomia a ser guardada.
  * @param price O preço a ser guardado.
+ * @param volume O volume em metros cúbicos a ser guardado.
  * @param type O tipo de meio de transporte a ser guardado.
  * @param geocode O geocódigo a ser guardado.
  */
-void save_transport(Transport* current, int id, int battery, int autonomy, float price, char* type, char* geocode);
+void save_transport(Transport* current, int id, int battery, int autonomy, float price, float volume, char* type, char* geocode);
 
 /**
  * @brief Armazena os meios de transporte num ficheiro.

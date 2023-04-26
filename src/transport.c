@@ -41,11 +41,12 @@ void free_transport_list(Transport** head) {
 	| Saves each parameter to its corresponding struct member.
 	|
 */
-void save_transport(Transport* current, int id, int battery, int autonomy, float price, char* type, char* geocode) {
+void save_transport(Transport* current, int id, int battery, int autonomy, float price, float volume, char* type, char* geocode) {
 	current->id = id;
 	current->battery = battery;
 	current->autonomy = autonomy;
 	current->price = price;
+	current->volume = volume;
 
 	current->type = (char*)malloc(MAX_LINE_LENGTH / 3 * sizeof(char));
 	strcpy(current->type, type);
@@ -85,7 +86,7 @@ int store_transports(Transport* head, int bool) {
 
 	// Run through the transport list
 	while (current != NULL) {
-		fprintf(fp, "%d;%d;%d;%.2f;%s;%s\n", current->id, current->battery, current->autonomy, current->price, current->type, current->geocode);
+		fprintf(fp, "%d;%d;%d;%.2f;%s;%s;%.2f\n", current->id, current->battery, current->autonomy, current->price, current->type, current->geocode, current->volume);
 		current = current->next;
 	}
 	fclose(fp);
@@ -137,7 +138,7 @@ Transport* read_transports(Transport* head, int bool) {
 		Transport* new_transport = (Transport*) malloc(sizeof(Transport));
 		save_transport(new_transport,
 						atoi(split_file_info[0]), atoi(split_file_info[1]),
-						atoi(split_file_info[2]), atof(split_file_info[3]),
+						atoi(split_file_info[2]), atof(split_file_info[3]), atof(split_file_info[6]),
 						split_file_info[4], split_file_info[5]);
 
 		// Add the info into the last node
@@ -175,7 +176,7 @@ void insert_tranport(Transport** head) {
 	Transport* current = *head;
 
 	int battery, autonomy;
-	float price;
+	float price, volume;
 	char type[MAX_LINE_LENGTH / 3], geocode[MAX_LINE_LENGTH / 3];
 
 	printf("Bateria: ");
@@ -186,6 +187,10 @@ void insert_tranport(Transport** head) {
 
 	printf("Preço: ");
 	scanf("%f", &price);
+	getchar();
+
+	printf("Volume em metros cúbicos: ");
+	scanf("%f", &volume);
 	getchar();
 
 	// Max size is a third of the max line length
@@ -207,10 +212,10 @@ void insert_tranport(Transport** head) {
 
 	// Check if there is a first node
 	if(isFirst) 
-		save_transport(current, 1, battery, autonomy, price, type, geocode);
+		save_transport(current, 1, battery, autonomy, price, volume, type, geocode);
 	else {
 		current->next = (Transport*)malloc(sizeof(Transport));
-		save_transport(current->next, current->id + 1, battery, autonomy, price, type, geocode);
+		save_transport(current->next, current->id + 1, battery, autonomy, price, volume, type, geocode);
 	}
 }
 #pragma endregion
@@ -272,8 +277,8 @@ int edit_transport(Transport** head, int id) {
 
 	while (current != NULL) {
 		if (current->id == id) {
-			printf("Tipo: %s, Geocódigo: %s, Bateria: %d, Autonomia: %d, Preço: %.2f\n", 
-					current->type, current->geocode, current->battery, current->autonomy, current->price);
+			printf("Tipo: %s, Geocódigo: %s, Bateria: %d, Autonomia: %d, Preço: %.2f, Volume: %.2f\n",
+				current->type, current->geocode, current->battery, current->autonomy, current->price, current->volume);
 
 			// Max size is a third of the max line length
 			printf("Insira o novo tipo: ");
@@ -294,8 +299,12 @@ int edit_transport(Transport** head, int id) {
 			scanf("%f", &current->price);
 			getchar();
 
-			printf("Tipo: %s, Geocódigo: %s, Bateria: %d, Autonomia: %d, Preço: %.2f\n",
-				current->type, current->geocode, current->battery, current->autonomy, current->price);
+			printf("Insira o novo volume em metros cúbicos: ");
+			scanf("%f", &current->volume);
+			getchar();
+
+			printf("Tipo: %s, Geocódigo: %s, Bateria: %d, Autonomia: %d, Preço: %.2f, Volume: %.2f\n",
+				current->type, current->geocode, current->battery, current->autonomy, current->price, current->volume);
 
 			return 1;
 		}

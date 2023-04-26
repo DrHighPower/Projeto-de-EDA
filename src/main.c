@@ -197,6 +197,7 @@ int main() {
 						printf("Autonomy: %d\n", autonomy_array[i]->autonomy);
 						printf("Bateria: %d\n", autonomy_array[i]->battery);
 						printf("Preço: %.2f\n", autonomy_array[i]->price);
+						printf("Volume: %.2fm3\n", autonomy_array[i]->volume);
 						printf("Tipo: %s\n", autonomy_array[i]->type);
 						printf("Geocódigo: %s\n", autonomy_array[i]->geocode);
 
@@ -212,12 +213,13 @@ int main() {
 					int transport_quant;
 					Transport** geocode_array = list_geocode(loaded_transports, &transport_quant);
 
-					// Prints all the sorted tranports
+					// Prints all the tranports with the same geocode
 					for (int i = 0; i < transport_quant; i++) {
 						printf("Id: %d\n", geocode_array[i]->id);
 						printf("Autonomy: %d\n", geocode_array[i]->autonomy);
 						printf("Bateria: %d\n", geocode_array[i]->battery);
 						printf("Preço: %.2f\n", geocode_array[i]->price);
+						printf("Volume: %.2fm3\n", geocode_array[i]->volume);
 						printf("Tipo: %s\n", geocode_array[i]->type);
 						printf("Geocódigo: %s\n", geocode_array[i]->geocode);
 
