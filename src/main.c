@@ -8,6 +8,7 @@
 #include "../include/transport.h"
 #include "../include/authentication.h"
 #include "../include/rental.h"
+#include "../include/graph.h"
 
 #pragma region ManagerMenu
 /*
@@ -106,8 +107,36 @@ void manager_menu(User* loaded_users, Transport* loaded_transport) {
 #pragma region Main
 int main() {
 	setlocale(LC_ALL, "Portuguese");
-	setlocale(LC_NUMERIC, "English"); // Effects the decimal point formatting so its "." and not ","
+	setlocale(LC_NUMERIC, "English"); // Effects the decimal point formatting so its "." and not ",";
+	
+	Graph* loaded_graph = (Graph*)malloc(sizeof(Graph));
+	loaded_graph->geocode = NULL;
+	loaded_graph->edge = NULL;
+	loaded_graph->next = NULL;
 
+	insert_node(loaded_graph, "1");
+	insert_node(loaded_graph, "2");
+	insert_node(loaded_graph, "3");
+
+	Vertex** array = (Vertex*)malloc(4*sizeof(Vertex));
+	array[0] = create_vertex("1");
+	array[1] = create_vertex("2");
+	array[2] = create_vertex("3");
+
+	insert_edge(loaded_graph, array[1], "1", 10);
+	insert_edge(loaded_graph, array[2], "1", 24);
+	insert_edge(loaded_graph, array[0], "3", 3);
+
+	Transport* loaded_transports = (Transport*)malloc(sizeof(Transport));
+	loaded_transports->next = NULL;
+
+	loaded_transports = read_transports(loaded_transports, 0);
+
+	add_transport(array[1], loaded_transports);
+	add_transport(array[1], loaded_transports->next);
+
+
+	/*
 	// Load the users into the memory
 	User* loaded_users = (User*)malloc(sizeof(User));
 	loaded_users->next = NULL;
@@ -264,7 +293,7 @@ int main() {
 		}
 
 	} while (choice != 6);
-	
+	*/
 	return 0;
 }
 #pragma endregion

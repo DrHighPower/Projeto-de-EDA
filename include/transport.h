@@ -7,12 +7,12 @@
  * @author João Telmo Barros Inverneiro
  */
 
- /**
-  * @struct transportInformation
-  * @brief Estrutura dos dados de um meio de transporte.
-  *
-  * Esta estrutura de dados contém o formato que os dados do meio de transporte são guardados, esta também é uma lista ligada.
-  */
+/**
+* @struct transportInformation
+* @brief Estrutura dos dados de um meio de transporte.
+*
+* Esta estrutura de dados contém o formato que os dados do meio de transporte são guardados, esta também é uma lista ligada.
+*/
 typedef struct transportInformation {
 	int id,								/**< O código unico de cada meio de transporte. */
 		battery,						/**< A bateria do meio de transporte. */
