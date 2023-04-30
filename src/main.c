@@ -118,7 +118,8 @@ int main() {
 	insert_node(loaded_graph, "2");
 	insert_node(loaded_graph, "3");
 
-	Vertex** array = (Vertex*)malloc(4*sizeof(Vertex));
+	int array_size = 3;
+	Vertex** array = (Vertex*)malloc(array_size+1 * sizeof(Vertex));
 	array[0] = create_vertex("1");
 	array[1] = create_vertex("2");
 	array[2] = create_vertex("3");
@@ -126,15 +127,23 @@ int main() {
 	insert_edge(loaded_graph, array[1], "1", 10);
 	insert_edge(loaded_graph, array[2], "1", 24);
 	insert_edge(loaded_graph, array[0], "3", 3);
+	insert_edge(loaded_graph, array[1], "2", 20);
 
 	Transport* loaded_transports = (Transport*)malloc(sizeof(Transport));
 	loaded_transports->next = NULL;
 
 	loaded_transports = read_transports(loaded_transports, 0);
 
-	add_transport(array[1], loaded_transports);
-	add_transport(array[1], loaded_transports->next);
+	add_vertex_transport(array[1], loaded_transports);
+	add_vertex_transport(array[1], loaded_transports->next);
 
+	//remove_node(&loaded_graph, "4");
+	//remove_edge(&loaded_graph, array[0], "1");
+	//array_size = remove_vertex(&loaded_graph, array[1], array, array_size);
+	//remove_vertex_transport(array[1], 2);
+
+	store_graph(loaded_graph, 1);
+	store_vertices(array, array_size, 1);
 
 	/*
 	// Load the users into the memory

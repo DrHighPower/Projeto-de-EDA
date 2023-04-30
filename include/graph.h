@@ -29,6 +29,15 @@ typedef struct graphInformation {
 
 void save_node(Graph* current, char* geocode);
 int insert_node(Graph* head, char* geocode);
+int remove_node(Graph** head, char* geocode);
+
 int insert_edge(Graph* head, Vertex* vertex, char* from, float weight);
+int remove_edge(Graph** head, Vertex* vertex, char* from);
+
 Vertex* create_vertex(char* geocode);
-int add_transport(Vertex* vertex, Transport* transport);
+int remove_vertex(Graph** head, Vertex* vertex, Vertex** vertices, int array_size);
+int add_vertex_transport(Vertex* vertex, Transport* transport);
+int remove_vertex_transport(Vertex* vertex, int id);
+
+int store_graph(Graph* head, int bool);
+int store_vertices(Vertex** vertices, int array_size, int bool);
