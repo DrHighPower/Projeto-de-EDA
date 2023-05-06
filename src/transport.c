@@ -422,3 +422,14 @@ int validate_transport(Transport* head, int id) {
 	return 0;
 }
 #pragma endregion
+
+Transport* get_transport(Transport* head, int id){
+	Transport* current = head;
+
+	while (current != NULL) {
+		if (current->id == id) return current;
+		current = current->next;
+	}
+
+	return NULL;
+}

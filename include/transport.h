@@ -152,3 +152,5 @@ Transport** list_geocode(Transport* head, int* transport_quant);
  * @return Se a função for bem sucedida é devolvido 1, se não é devolvido 0.
  */
 int validate_transport(Transport* head, int id);
+
+Transport* get_transport(Transport* head, int id);
