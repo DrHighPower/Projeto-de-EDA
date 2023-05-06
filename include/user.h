@@ -154,6 +154,8 @@ int edit_user(User** head, int id);
  */
 int get_user_type(User* head, int id);
 
+User* get_user(User* head, int id);
+
 /**
  * @brief Adiciona saldo a um utilizador
  *

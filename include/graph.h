@@ -8,11 +8,14 @@
  */
 
 typedef struct transportInformation Transport;
+typedef struct userInformation User;
 
 typedef struct vertexInformation {
 	char *geocode;
-	int transport_quantity;
+	int transport_quantity,
+		user_quantity;
 	Transport** transports;
+	User** users;
 } Vertex;
 
 typedef struct edgeInformation {
@@ -39,11 +42,15 @@ int remove_edge(Graph** head, Vertex* vertex, char* from);
 
 Vertex* create_vertex(char* geocode);
 int remove_vertex(Graph** head, Vertex* vertex, Vertex** vertices, int array_size);
+
 Vertex* add_vertex_transport(Vertex* vertex, Transport* transport);
+Vertex* add_vertex_users(Vertex* vertex, User* user);
+
 int remove_vertex_transport(Vertex* vertex, int id);
+int remove_vertex_user(Vertex* vertex, int id);
 
 int store_graph(Graph* head, int bool);
 int store_vertices(Vertex** vertices, int array_size, int bool);
 
 Graph* read_graph(Graph* head, Vertex** vertex, int vertex_size, int bool);
-Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports, int bool);
+Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports, User* users, int bool);

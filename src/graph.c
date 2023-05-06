@@ -6,6 +6,7 @@
 
 #include "../include/graph.h"
 #include "../include/transport.h"
+#include "../include/user.h"
 #include "../include/additional_functions.h"
 
 #define MAX_LINE_LENGTH 1024
@@ -196,6 +197,10 @@ Vertex* create_vertex(char* geocode) {
 	new_vertex->geocode = (char*)malloc(MAX_LINE_LENGTH / 3 * sizeof(char));
 
 	strcpy(new_vertex->geocode, geocode);
+
+	new_vertex->user_quantity = 0;
+	new_vertex->users = NULL;
+
 	new_vertex->transport_quantity = 0;
 	new_vertex->transports = NULL;
 
@@ -232,6 +237,14 @@ Vertex* add_vertex_transport(Vertex* vertex, Transport* transport) {
 	return vertex;
 }
 
+Vertex* add_vertex_users(Vertex* vertex, User* user) {
+	vertex->user_quantity++;
+	vertex->users = (Vertex*)realloc(vertex->users, vertex->user_quantity * sizeof(Vertex));
+	vertex->users[vertex->user_quantity - 1] = user;
+
+	return vertex;
+}
+
 int remove_vertex_transport(Vertex* vertex, int id) {
 
 	// Checks if the element was found
@@ -245,6 +258,24 @@ int remove_vertex_transport(Vertex* vertex, int id) {
 
 	if (found) {
 		vertex->transport_quantity--;
+		return 1;
+	}
+	else return 0;
+}
+
+int remove_vertex_user(Vertex* vertex, int id) {
+
+	// Checks if the element was found
+	int found = 0;
+	for (int i = 0; i < vertex->user_quantity; i++) {
+		if (vertex->users[i]->id == id) found = 1;
+
+		// Move every element down, and remove the last
+		if (found && i + 1 <= vertex->user_quantity) vertex->users[i] = vertex->users[i + 1];
+	}
+
+	if (found) {
+		vertex->user_quantity--;
 		return 1;
 	}
 	else return 0;
@@ -309,6 +340,17 @@ int store_vertices(Vertex** vertices, int vertex_size, int bool) {
 		}
 		if(vertices[i]->transport_quantity == 0) fprintf(fp, " "); // Store a space if there are no transports
 
+		fprintf(fp, ";");
+
+		// Go through the users array
+		for (int j = 0; j < vertices[i]->user_quantity; j++) {
+			fprintf(fp, "%d", vertices[i]->users[j]->id); // Store a user id
+
+			// Check if there are more users
+			if (j < vertices[i]->user_quantity - 1) fprintf(fp, ",");
+		}
+		if (vertices[i]->user_quantity == 0) fprintf(fp, " "); // Store a space if there are no users
+
 		// Store the new line character
 		fprintf(fp, "\n");
 	}
@@ -371,7 +413,7 @@ Graph* read_graph(Graph* head, Vertex** vertex, int vertex_size, int bool){
 	return current;
 }
 
-Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports, int bool) {
+Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports, User* users, int bool) {
 	FILE* fp;
 
 	// Open different files to write
@@ -393,6 +435,7 @@ Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports,
 	char file_info[MAX_LINE_LENGTH];
 	char** split_info = NULL;
 	char** split_transports = NULL;
+	char** split_users = NULL;
 
 	// Run through the file
 	while (fgets(file_info, MAX_LINE_LENGTH, fp) != NULL) {
@@ -402,12 +445,18 @@ Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports,
 		// Split the file info into an array
 		int split_info_size = str_split(file_info, &split_info, ";");
 		int split_transports_size = str_split(split_info[1], &split_transports, ",");
+		int split_users_size = str_split(split_info[2], &split_users, ",");
 
 		// Create new vertex
 		vertex[vertex_pos] = create_vertex(split_info[0]);
 		if (strcmp(split_info[1], " ") != 0) {
 			for (int i = 0; i < split_transports_size; i++) {
 				add_vertex_transport(vertex[vertex_pos], get_transport(transports, atoi(split_transports[i])));
+			}
+		}
+		if (strcmp(split_info[2], " ") != 0) {
+			for (int i = 0; i < split_users_size; i++) {
+				add_vertex_users(vertex[vertex_pos], get_user(users, atoi(split_users[i])));
 			}
 		}
 
@@ -424,6 +473,9 @@ Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports,
 		}
 		for (int i = 0; i < split_transports_size; i++) {
 			free(split_transports[i]);
+		}
+		for (int i = 0; i < split_users_size; i++) {
+			free(split_users[i]);
 		}
 	}
 	fclose(fp);

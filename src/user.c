@@ -427,6 +427,17 @@ int get_user_type(User* head, int id) {
 }
 #pragma endregion
 
+User* get_user(User* head, int id) {
+	User* current = head;
+
+	while (current != NULL) {
+		if (current->id == id) return current;
+		current = current->next;
+	}
+
+	return NULL;
+}
+
 #pragma region AddBalance
 /*
 	|--------------------------------------------------------------------------

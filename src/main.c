@@ -131,22 +131,29 @@ int main() {
 
 	Transport* loaded_transports = (Transport*)malloc(sizeof(Transport));
 	loaded_transports->next = NULL;
-
 	loaded_transports = read_transports(loaded_transports, 0);
 
+	User* loaded_users = (User*)malloc(sizeof(User));
+	loaded_users->next = NULL;
+	loaded_users = read_users(loaded_users, 0);
+
 	/*add_vertex_transport(array[0], loaded_transports);
-	add_vertex_transport(array[1], loaded_transports);
-	add_vertex_transport(array[2], loaded_transports);*/
+	add_vertex_transport(array[0], loaded_transports->next->next);
+	add_vertex_transport(array[1], loaded_transports->next);*/
+
+	/*add_vertex_users(array[0], loaded_users);
+	add_vertex_users(array[2], loaded_users->next);
+	add_vertex_users(array[2], loaded_users->next->next);*/
 
 	//remove_node(&loaded_graph, "4");
 	//remove_edge(&loaded_graph, array[0], "1");
 	//array_size = remove_vertex(&loaded_graph, array[1], array, array_size);
 	//remove_vertex_transport(array[1], 2);
 
-	//store_graph(loaded_graph, 1);
-	//store_vertices(array, array_size, 1);
+	/*store_graph(loaded_graph, 1);
+	store_vertices(array, array_size, 1);*/
 
-	array = read_vertices(array, &array_size, loaded_transports, 1);
+	array = read_vertices(array, &array_size, loaded_transports, loaded_users, 1);
 	loaded_graph = read_graph(loaded_graph, array, array_size, 1);
 
 
