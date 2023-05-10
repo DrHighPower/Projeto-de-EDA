@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <locale.h>
 
 #include "../include/user.h"
@@ -155,6 +156,16 @@ int main() {
 
 	array = read_vertices(array, &array_size, loaded_transports, loaded_users, 1);
 	loaded_graph = read_graph(loaded_graph, array, array_size, 1);
+
+	int vertices_size = 2;
+	Vertex** vertices = get_nearest_vertices(loaded_graph, &vertices_size,user_geodode(array, array_size, 1), 50);
+	for (int i = 0; i < vertices_size - 2; i++) {
+		for (int j = 0; j < vertices[i]->transport_quantity; j++) {
+			if (strcmp(vertices[i]->transports[j]->type, "Trotinete") == 0)
+				printf("Id: %d, Geocódigo: %s, Tipo: %s, Bateria: %d\n", vertices[i]->transports[j]->id, vertices[i]->geocode, vertices[i]->transports[j]->type, vertices[i]->transports[j]->battery);
+		}
+	}
+	free(vertices);
 
 
 	/*

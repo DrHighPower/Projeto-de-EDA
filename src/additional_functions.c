@@ -139,3 +139,11 @@ char* add_minutes(const char* time, const char* date, int minutes) {
 	return new_time_date;
 }
 #pragma endregion
+
+int has_string(char** array, int array_size, char* string) {
+	for (int i = 0; i < array_size; i++) {
+		if (strcmp(array[i], string) == 0) return 1;
+	}
+
+	return 0;
+}

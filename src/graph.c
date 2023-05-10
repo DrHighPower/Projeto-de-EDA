@@ -230,8 +230,13 @@ int remove_vertex(Graph** head, Vertex* vertex, Vertex** vertices, int array_siz
 }
 
 Vertex* add_vertex_transport(Vertex* vertex, Transport* transport) {
+
+	// Change the transport geocode
+	strcpy(transport->geocode, vertex->geocode);
+
+	// Add the transport to the vertex
 	vertex->transport_quantity++;
-	vertex->transports = (Vertex*)realloc(vertex->transports, vertex->transport_quantity * sizeof(Vertex));
+	vertex->transports = (Transport*)realloc(vertex->transports, vertex->transport_quantity * sizeof(Transport));
 	vertex->transports[vertex->transport_quantity - 1] = transport;
 
 	return vertex;
@@ -239,7 +244,7 @@ Vertex* add_vertex_transport(Vertex* vertex, Transport* transport) {
 
 Vertex* add_vertex_users(Vertex* vertex, User* user) {
 	vertex->user_quantity++;
-	vertex->users = (Vertex*)realloc(vertex->users, vertex->user_quantity * sizeof(Vertex));
+	vertex->users = (User*)realloc(vertex->users, vertex->user_quantity * sizeof(User));
 	vertex->users[vertex->user_quantity - 1] = user;
 
 	return vertex;
@@ -481,4 +486,90 @@ Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports,
 	fclose(fp);
 
 	return vertex;
+}
+
+char* user_geodode(Vertex** vertex, int vertex_size, int id) {
+	// Go through the vertex array
+	for (int i = 0; i < vertex_size; i++) {
+
+		// Go through the users array
+		for (int j = 0; j < vertex[i]->user_quantity; j++) {
+			if (vertex[i]->users[j]->id == id) return vertex[i]->geocode; // Return the vertex geocode
+		}
+	}
+
+	// Return NULL if the user is not found
+	return NULL;
+}
+
+Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, int* vertices_pos, char* location, int radius, int travelled, char*** geocodes_array, int* geocodes_size, int* geocodes_pos) {
+	Graph* current_location = head;
+
+	// Go to the corresponding node in the graph
+	while (strcmp(current_location->geocode, location) != 0)
+		current_location = current_location->next;
+
+	Edge* current_edge = current_location->edge;
+	
+	// Go through the adjacent vertices
+	while (current_edge != NULL) {
+
+		// Checks if it has reached the max radius and if the vertex already has been passed
+		if (current_edge->weight + travelled <= radius && !has_string(*geocodes_array, *geocodes_size - 2, current_edge->vertex->geocode)) {
+
+			// Allocate memory for the geocode string
+			(*geocodes_array)[*geocodes_pos] = (char*)malloc(MAX_GEOCODE * sizeof(char));
+			strcpy((*geocodes_array)[*geocodes_pos], current_edge->vertex->geocode);
+			*geocodes_size = *geocodes_size + 1;
+
+			// Reallocate memory for the array of geocodes
+			*geocodes_array = (char**)realloc(*geocodes_array, *geocodes_size * sizeof(char*));
+			*geocodes_pos = *geocodes_pos + 1;
+
+			// Enter a recursive function so it does the same to each adjacent vertex and return the vertices found
+			Vertex** new_vertices = nearest_vertices(head, vertices, vertices_size, vertices_pos, current_edge->vertex->geocode, radius, current_edge->weight + travelled, geocodes_array, geocodes_size, geocodes_pos);
+
+			// Allocate memory for the new vertex
+			(*vertices)[*vertices_pos] = (Vertex*)malloc(sizeof(Vertex));
+			*vertices_pos = *vertices_pos + 1;
+
+			// Reallocate memory for the array of vertices
+			*vertices_size = *vertices_size + 1;
+			*vertices = (Vertex**)realloc(*vertices, *vertices_size * sizeof(Vertex*));
+
+			//for (int i = 0; i < *vertices_size - 2; i++) printf("%d", (*vertices)[i]->transport_quantity);
+
+
+			// Copy the new_vertices to the vertices array and add the new vertex
+			for (int i = 0; i < *vertices_size - 2; i++) {
+				if(i == *vertices_size - 3) (*vertices)[i] = current_edge->vertex;
+				else (*vertices)[i] = new_vertices[i];
+			}
+		}
+		current_edge = current_edge->next;
+	}
+
+	return *vertices;
+}
+
+Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, int radius) {
+
+	int geocode_size = 2; // Stores the size of the array of geocodes
+	int geocode_pos = 0;  // Stores the position of the last geocode added
+
+	// Allocates memory for the array of geocodes
+	char** geocode_array = (char**)malloc(geocode_size * sizeof(char*));
+
+	int vertices_pos = 0;   // Stores the position of the last vertex added
+
+	// Allocates memory for the array of vertices
+	Vertex** vertices = (Vertex**)malloc(*size * sizeof(Vertex*));
+
+	// Get the nearest transports
+	nearest_vertices(graph, &vertices, size, &vertices_pos,location, radius, 0, &geocode_array, &geocode_size, &geocode_pos);
+
+	// Free the array of geocodes
+	free(geocode_array);
+
+	return vertices;
 }

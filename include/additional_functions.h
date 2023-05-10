@@ -62,3 +62,5 @@ void newline_remove(char* string);
  * @return O tempo e a data numa string.
  */
 char* add_minutes(const char* time, const char* date, int minutes);
+
+int has_string(char** array, int array_size, char* string);

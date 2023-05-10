@@ -54,3 +54,7 @@ int store_vertices(Vertex** vertices, int array_size, int bool);
 
 Graph* read_graph(Graph* head, Vertex** vertex, int vertex_size, int bool);
 Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports, User* users, int bool);
+
+char* user_geodode(Vertex** vertex, int vertex_size, int id);
+Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, int* vertices_pos, char* location, int radius, int travelled, char*** geocodes_array, int* geocodes_size, int* geocodes_pos);
+Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, int radius);
