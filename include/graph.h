@@ -38,6 +38,7 @@ int insert_node(Graph* head, char* geocode);
 int remove_node(Graph** head, char* geocode);
 
 int insert_edge(Graph* head, Vertex* vertex, char* from, float weight);
+int edit_edge(Graph** head, Vertex* vertex, char* from, float weight);
 int remove_edge(Graph** head, Vertex* vertex, char* from);
 
 Vertex* create_vertex(char* geocode);
@@ -56,5 +57,5 @@ Graph* read_graph(Graph* head, Vertex** vertex, int vertex_size, int bool);
 Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports, User* users, int bool);
 
 char* user_geodode(Vertex** vertex, int vertex_size, int id);
-Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, int* vertices_pos, char* location, int radius, int travelled, char*** geocodes_array, int* geocodes_size, int* geocodes_pos);
-Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, int radius);
+Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, int* vertices_pos, char* location, float radius, float travelled, char*** geocodes_array, int* geocodes_size, int* geocodes_pos);
+Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, float radius);

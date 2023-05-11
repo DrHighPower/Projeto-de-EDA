@@ -150,6 +150,35 @@ int insert_edge(Graph* head, Vertex* vertex, char* from, float weight) {
 	return 0;
 }
 
+int edit_edge(Graph** head, Vertex* vertex, char* from, float weight) {
+	Graph* current = *head;
+
+	// Goes to the corresponding node
+	while (strcmp(current->geocode, from) != 0) {
+		current = current->next;
+
+		// Return 0 if the node doesnt exist
+		if (current == NULL) return 0;
+	}
+
+	// Checks if there are any edges
+	if (current->edge == NULL) return 0;
+	Edge* current_edge = current->edge;
+
+	// Go through all the edges
+	while (current_edge != NULL) {
+
+		// Edit the weight when the vertex is found
+		if (strcmp(current_edge->vertex->geocode, vertex->geocode) == 0) {
+			current_edge->weight = weight;
+			return 1;
+		}
+
+		current_edge = current_edge->next;
+	}
+	return 0;
+}
+
 int remove_edge(Graph** head, Vertex* vertex, char* from) {
 	Graph* current = *head;
 
@@ -161,6 +190,7 @@ int remove_edge(Graph** head, Vertex* vertex, char* from) {
 		if (current == NULL) return 0;
 	}
 
+	// Checks if there are any edges
 	if (current->edge == NULL) return 0;
 	Edge* current_edge = current->edge;
 
@@ -502,7 +532,7 @@ char* user_geodode(Vertex** vertex, int vertex_size, int id) {
 	return NULL;
 }
 
-Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, int* vertices_pos, char* location, int radius, int travelled, char*** geocodes_array, int* geocodes_size, int* geocodes_pos) {
+Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, int* vertices_pos, char* location, float radius, float travelled, char*** geocodes_array, int* geocodes_size, int* geocodes_pos) {
 	Graph* current_location = head;
 
 	// Go to the corresponding node in the graph
@@ -537,9 +567,6 @@ Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, i
 			*vertices_size = *vertices_size + 1;
 			*vertices = (Vertex**)realloc(*vertices, *vertices_size * sizeof(Vertex*));
 
-			//for (int i = 0; i < *vertices_size - 2; i++) printf("%d", (*vertices)[i]->transport_quantity);
-
-
 			// Copy the new_vertices to the vertices array and add the new vertex
 			for (int i = 0; i < *vertices_size - 2; i++) {
 				if(i == *vertices_size - 3) (*vertices)[i] = current_edge->vertex;
@@ -552,7 +579,10 @@ Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, i
 	return *vertices;
 }
 
-Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, int radius) {
+Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, float radius) {
+	
+	// Check if it has a possible location
+	if(location == NULL) return NULL;
 
 	int geocode_size = 2; // Stores the size of the array of geocodes
 	int geocode_pos = 0;  // Stores the position of the last geocode added

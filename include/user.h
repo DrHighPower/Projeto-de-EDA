@@ -135,14 +135,14 @@ int remove_user(User** head, int id);
  * @param head A lista ligada a ter o utilizador editado.
  * @param id O código unico do utilizador a ser editado
  *
- * @return Se a função for bem sucedida é devolvido 1, se não é devolvido 0.
+ * @return Se a função for bem sucedida é devolvido o utilizador editado, se não é devolvido NULL.
  * 
  * @see newline_remove
  * @see validate_NIF
  * 
  * @note O utilizador só fica editado na memória.
  */
-int edit_user(User** head, int id);
+User* edit_user(User** head, int id);
 
 /**
  * @brief Obtém o nivel de acesso do utilizador.

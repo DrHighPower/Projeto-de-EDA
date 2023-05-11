@@ -340,10 +340,10 @@ int remove_user(User** head, int id) {
 	|--------------------------------------------------------------------------
 	|
 	| Edits a user from the given linked list using the given user id.
-	| Returns a boolean value accordingly.
+	| Returns the edited user.
 	|
 */
-int edit_user(User** head, int id) {
+User* edit_user(User** head, int id) {
 	User* current = *head;
 
 	while (current != NULL) {
@@ -392,16 +392,13 @@ int edit_user(User** head, int id) {
 			} while (valid_nif);
 			getchar();
 
-			printf("Nome: %s, Residencia: %s, NIF: %s\n",
-				current->name, current->residency, current->NIF);
-
-			return 1;
+			return current;
 		}
 
 		current = current->next;
 	}
 
-	return 0;
+	return NULL;
 }
 #pragma endregion
 

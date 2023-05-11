@@ -172,9 +172,10 @@ Transport* read_transports(Transport* head, int bool) {
 	| Inserts a new transport into the last node of the linked list.
 	|
 */
-void insert_tranport(Transport** head) {
+int insert_tranport(Transport** head) {
 	Transport* current = *head;
 
+	int id = 0;
 	int battery, autonomy;
 	float price, volume;
 	char type[MAX_LINE_LENGTH / 3], geocode[MAX_LINE_LENGTH / 3];
@@ -211,12 +212,17 @@ void insert_tranport(Transport** head) {
 	}
 
 	// Check if there is a first node
-	if(isFirst) 
+	if (isFirst) {
+		id = 1;
 		save_transport(current, 1, battery, autonomy, price, volume, type, geocode);
+	}
 	else {
+		id = current->id + 1;
 		current->next = (Transport*)malloc(sizeof(Transport));
 		save_transport(current->next, current->id + 1, battery, autonomy, price, volume, type, geocode);
 	}
+
+	return id;
 }
 #pragma endregion
 
@@ -269,10 +275,10 @@ int remove_transport(Transport** head, int id) {
 	|
 	| Edits a transport from the given linked list using 
 	| the given transport id.
-	| Returns a boolean value accordingly.
+	| Returns the edited transport.
 	|
 */
-int edit_transport(Transport** head, int id) {
+Transport* edit_transport(Transport** head, int id) {
 	Transport* current = *head;
 
 	while (current != NULL) {
@@ -303,16 +309,13 @@ int edit_transport(Transport** head, int id) {
 			scanf("%f", &current->volume);
 			getchar();
 
-			printf("Tipo: %s, Geocódigo: %s, Bateria: %d, Autonomia: %d, Preço: %.2f, Volume: %.2f\n",
-				current->type, current->geocode, current->battery, current->autonomy, current->price, current->volume);
-
-			return 1;
+			return current;
 		}
 
 		current = current->next;
 	}
 
-	return 0;
+	return NULL;
 }
 #pragma endregion
 
@@ -400,30 +403,18 @@ Transport** list_geocode(Transport* head, int* transport_quant) {
 }
 #pragma endregion
 
-#pragma region ValidateTransport
+#pragma region GetTransport
 /*
 	|--------------------------------------------------------------------------
-	| Validate transport
+	| Get the transport
 	|--------------------------------------------------------------------------
 	|
-	| Verifies if the given id matches with a existing transport id in
-	| the linked list.
-	| Return a boolean value accordingly.
+	| Returns a transport if the given id matches with a existing transport
+	| id in the linked list.
+	| Returns the transport matching the id
 	|
 */
-int validate_transport(Transport* head, int id) {
-	Transport* current = head;
-
-	while (current != NULL) {
-		if (current->id == id) return 1;
-		current = current->next;
-	}
-
-	return 0;
-}
-#pragma endregion
-
-Transport* get_transport(Transport* head, int id){
+Transport* get_transport(Transport* head, int id) {
 	Transport* current = head;
 
 	while (current != NULL) {
@@ -433,3 +424,4 @@ Transport* get_transport(Transport* head, int id){
 
 	return NULL;
 }
+#pragma endregion

@@ -84,12 +84,14 @@ Transport* read_transports(Transport* head, int bool);
  *
  * @param head A lista ligada a receber um novo meio de transporte.
  *
+ * @return O código unico do novo transporte.
+ * 
  * @see newline_remove
  * @see save_transport
  * 
  * @note O novo meio de transporte só fica guardado na memória.
  */
-void insert_tranport(Transport** head);
+int insert_tranport(Transport** head);
 
 /**
  * @brief Remove um meio de transporte.
@@ -113,13 +115,13 @@ int remove_transport(Transport** head, int id);
  * @param head A lista ligada a ter o meio de transporte editado.
  * @param id O código unico do meio de transporte a ser editado
  *
- * @return Se a função for bem sucedida é devolvido 1, se não é devolvido 0.
+ * @return Se a função for bem sucedida é devolvido o meio de transporte editado, se não é devolvido NULL.
  *
  * @see newline_remove
  * 
  * @note O meio de transporte só fica editado na memória.
  */
-int edit_transport(Transport** head, int id);
+Transport* edit_transport(Transport** head, int id);
 
 /**
  * @brief Retorna uma lista de transportes por ordem decrescente de autonomia.
@@ -142,15 +144,13 @@ Transport** list_autonomy(Transport* head, int* transport_quant);
 Transport** list_geocode(Transport* head, int* transport_quant);
 
 /**
- * @brief Verifica a existência de um meio de transporte.
+ * @brief Retorna um meio de transporte.
  *
- * Verifica se o dado código corresponde com um meio de transporte na lista ligada.
+ * Retorna um meio de transporte se o dado código corresponde com um meio de transporte na lista ligada.
  * 
  * @param head A lista ligada a ser percorrida.
- * @param id O código a ser verificado.
+ * @param id O código do transporte a ser retornado.
  *
- * @return Se a função for bem sucedida é devolvido 1, se não é devolvido 0.
+ * @return Se a função for bem sucedida é devolvido o transporte, se não é devolvido NULL.
  */
-int validate_transport(Transport* head, int id);
-
 Transport* get_transport(Transport* head, int id);

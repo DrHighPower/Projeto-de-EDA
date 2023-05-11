@@ -5,11 +5,40 @@
 #include <string.h>
 #include <locale.h>
 
+#include "../include/additional_functions.h"
 #include "../include/user.h"
 #include "../include/transport.h"
 #include "../include/authentication.h"
 #include "../include/rental.h"
 #include "../include/graph.h"
+
+#define MAX_LINE_LENGTH 1024
+
+int edge_functions( char* text, char* from, char* to, Vertex** vertices, int vertices_size, int* vertices_pos) {
+	printf("%s\n", text);
+
+	// Get the node geocode
+	printf("De: ");
+	fgets(from, MAX_LINE_LENGTH / 3, stdin);
+	newline_remove(from);
+
+	// Get the vertex geocode
+	printf("Para: ");
+	fgets(to, MAX_LINE_LENGTH / 3, stdin);
+	newline_remove(to);
+
+	// Get the vertex by the geocode
+	for (*vertices_pos = 0; *vertices_pos < vertices_size; *vertices_pos = *vertices_pos + 1) {
+		if (strcmp(vertices[*vertices_pos]->geocode, to) == 0) break;
+	}
+
+	// Check the vertex was found in the array
+	if (*vertices_pos == vertices_size) {
+		printf("Vertice de destino não encontrado\n");
+		return 0;
+	}
+	return 1;
+}
 
 #pragma region ManagerMenu
 /*
@@ -20,7 +49,7 @@
 	| Creates a menu for the users with the manager type
 	|
 */
-void manager_menu(User* loaded_users, Transport* loaded_transport) {
+void manager_menu(User* loaded_users, Transport* loaded_transport, Graph* loaded_graph, Vertex*** loaded_vertices, int* vertices_size) {
 	// Variable that stores the user's choice
 	int choice;
 
@@ -32,8 +61,17 @@ void manager_menu(User* loaded_users, Transport* loaded_transport) {
 		printf("3. Adicionar meio de transporte\n");
 		printf("4. Editar meio de transporte\n");
 		printf("5. Remover meio de tranporte\n");
-		printf("6. Salvar alterações\n");
-		printf("7. Sair\n");
+		printf("6. Adicionar vertice\n");
+		printf("7. Remover vertice\n");
+		printf("8. Adicionar aresta\n");
+		printf("9. Editar aresta\n");
+		printf("10. Remover aresta\n");
+		printf("11. Adicionar meio de transporte a um vertice\n");
+		printf("12. Remover meio de transporte de um vertice\n");
+		printf("13. Adicionar utilizador a um vertice\n");
+		printf("14. Remover utilizador de um vertice\n");
+		printf("15. Salvar alterações\n");
+		printf("16. Sair\n");
 		printf("_________________________________\n");
 		printf("Insira a sua escolha: ");
 
@@ -76,7 +114,10 @@ void manager_menu(User* loaded_users, Transport* loaded_transport) {
 					scanf("%d", &edit_tranport_id);
 					getchar();
 
-					edit_transport(&loaded_transport, edit_tranport_id);
+					Transport* edited_transport = edit_transport(&loaded_transport, edit_tranport_id);
+
+					printf("Tipo: %s, Geocódigo: %s, Bateria: %d, Autonomia: %d, Preço: %.2f, Volume: %.2f\n",
+						edited_transport->type, edited_transport->geocode, edited_transport->battery, edited_transport->autonomy, edited_transport->price, edited_transport->volume);
 				}
 				break;
 			case 5:
@@ -91,17 +132,210 @@ void manager_menu(User* loaded_users, Transport* loaded_transport) {
 				}
 				break;
 			case 6:
-				store_users(loaded_users, 0);
-				store_transports(loaded_transport, 0);
+				{
+					// Get the new geocode
+					char new_geocode[MAX_LINE_LENGTH / 3];
+					printf("Novo geocódigo a adicionar ao grafo: ");
+					fgets(new_geocode, MAX_LINE_LENGTH / 3, stdin);
+					newline_remove(new_geocode);
+
+					// Inserts and checks if the geocode is not duplicated
+					if (insert_node(loaded_graph, new_geocode)) {
+
+						// Allocate memory for the new vertex
+						(*loaded_vertices)[*vertices_size] = (Vertex*)malloc(sizeof(Vertex));
+
+						// Reallocate memory for the array of vertices
+						*vertices_size = *vertices_size + 1;
+						*loaded_vertices = (Vertex**)realloc(*loaded_vertices, *vertices_size * sizeof(Vertex*));
+
+						// Create new vertex
+						(*loaded_vertices)[*vertices_size - 1] = create_vertex(new_geocode);
+					}
+					else printf("Vertice já existente no grafo.\n");
+				}
 				break;
 			case 7:
+				{
+					// Get the geocode to be removed
+					char remove_geocode[MAX_LINE_LENGTH / 3];
+					printf("Geocódigo a remover do grafo: ");
+					fgets(remove_geocode, MAX_LINE_LENGTH / 3, stdin);
+					newline_remove(remove_geocode);
+
+					// Get the vertex by the geocode
+					int vertices_pos;
+					for (vertices_pos = 0; vertices_pos < *vertices_size; vertices_pos++) {
+						if (strcmp((*loaded_vertices)[vertices_pos]->geocode, remove_geocode) == 0) break;
+					}
+
+					// Check if the vertex was found and then remove it
+					if (vertices_pos != *vertices_size) {
+						*vertices_size = remove_vertex(&loaded_graph, (*loaded_vertices)[vertices_pos], *loaded_vertices, *vertices_size);
+						remove_node(&loaded_graph, remove_geocode);
+					}
+					else printf("Vertice não encontrado no grafo.\n");
+				}
+				break;
+			case 8:
+				{
+					char from[MAX_LINE_LENGTH / 3]; // Stores the node geocode that the vertex is gonna be connected to 
+					char to[MAX_LINE_LENGTH / 3];	// Stores the vertex geocode
+					float weight;					// Stores the weight
+					int vertices_pos = 0;			// Stores the position of the vertex
+
+					// Ask the user for input
+					if (!edge_functions("Adicionar uma aresta", from, to, *loaded_vertices, *vertices_size, &vertices_pos)) break;
+					
+					// Get the weight
+					printf("Distância, em metros, dos vertices: ");
+					scanf("%f", &weight);
+
+					if(!insert_edge(loaded_graph, (*loaded_vertices)[vertices_pos], from, weight)) printf("Vertices não encontrados ou já existe aresta\n");
+				}
+				break;
+			case 9:
+				{
+					char from[MAX_LINE_LENGTH / 3]; // Stores the node geocode that the vertex is gonna be connected to 
+					char to[MAX_LINE_LENGTH / 3];	// Stores the vertex geocode
+					float weight;					// Stores the weight
+					int vertices_pos = 0;			// Stores the position of the vertex
+
+					// Ask the user for input
+					if (!edge_functions("Editar uma aresta", from, to, *loaded_vertices, *vertices_size, &vertices_pos)) break;
+
+					// Get the new weight
+					printf("Nova distância, em metros, dos vertices: ");
+					scanf("%f", &weight);
+
+					if (!edit_edge(&loaded_graph, (*loaded_vertices)[vertices_pos], from, weight)) printf("Vertices não encontrados\n");
+				}
+				break;
+			case 10:
+				{
+					char from[MAX_LINE_LENGTH / 3]; // Stores the node geocode that the vertex is gonna be connected to 
+					char to[MAX_LINE_LENGTH / 3];	// Stores the vertex geocode
+					float weight;					// Stores the weight
+					int vertices_pos = 0;			// Stores the position of the vertex
+
+					// Ask the user for input
+					if (!edge_functions("Remover uma aresta", from, to, *loaded_vertices, *vertices_size, &vertices_pos)) break;
+
+					if (!remove_edge(&loaded_graph, (*loaded_vertices)[vertices_pos], from)) printf("Vertices não encontrados\n");
+				}
+				break;
+			case 11:
+				{
+					char geocode[MAX_LINE_LENGTH / 3]; // Stores the vertex geocode
+					int transport_id;				   // Stores the tranport id
+					int vertices_pos = 0;			   // Stores the position of the vertex 
+
+					// Get the geocode
+					printf("Geocódigo do vertice a adicionar o meio de transporte: ");
+					fgets(geocode, MAX_LINE_LENGTH / 3, stdin);
+					newline_remove(geocode);
+
+					// Get the transport id
+					printf("Id do meio de transporte a adicionar no vertice: ");
+					scanf("%d", &transport_id);
+
+					// Goes through all the vertices and removes all the transports with the same id, meaning that there cant be a duplicate
+					for (int i = 0; i < *vertices_size; i++) {
+
+						// If the transport is in another vertex it is removed
+						remove_vertex_transport((*loaded_vertices)[i], transport_id);
+
+						// Check if the vertex with the same geocode was found
+						if (strcmp((*loaded_vertices)[i]->geocode, geocode) == 0) vertices_pos = i;
+					}
+
+					// Get the transport to add in the vertex
+					Transport* added_transport = get_transport(loaded_transport, transport_id);
+
+					add_vertex_transport((*loaded_vertices)[vertices_pos], added_transport);
+				}
+				break;
+			case 12:
+				{
+					int transport_id; // Stores the tranport id
+					int found = 0;	  // Stores a boolean to check if any transport was removed
+
+					// Get the transport id
+					printf("Id do meio de transporte que é para remover dos vertices: ");
+					scanf("%d", &transport_id);
+
+					// Goes through all the vertices and removes all the transports with the same id
+					for (int i = 0; i < *vertices_size; i++) {
+						if (remove_vertex_transport((*loaded_vertices)[i], transport_id)) found = 1;
+					}
+
+					// Check if the transport was removed
+					if (!found) printf("Não foi possivel remover o meio de transporte\n");
+				}
+				break;
+			case 13:
+				{
+					char geocode[MAX_LINE_LENGTH / 3]; // Stores the vertex geocode
+					int user_id;					   // Stores the user id
+					int vertices_pos = 0;			   // Stores the position of the vertex 
+
+					// Get the geocode
+					printf("Geocódigo do vertice a adicionar o utilizador: ");
+					fgets(geocode, MAX_LINE_LENGTH / 3, stdin);
+					newline_remove(geocode);
+
+					// Get the transport id
+					printf("Id do utilizador a adicionar no vertice: ");
+					scanf("%d", &user_id);
+
+					// Goes through all the vertices and removes all the users with the same id, meaning that there cant be a duplicate
+					for (int i = 0; i < *vertices_size; i++) {
+
+						// If the user is in another vertex it is removed
+						remove_vertex_user((*loaded_vertices)[i], user_id);
+
+						// Check if the vertex with the same geocode was found
+						if (strcmp((*loaded_vertices)[i]->geocode, geocode) == 0) vertices_pos = i;
+					}
+
+					// Get the user to add in the vertex
+					User* added_user = get_user(loaded_users, user_id);
+
+					add_vertex_users((*loaded_vertices)[vertices_pos], added_user);
+				}
+				break;
+			case 14:
+				{
+					int user_id;   // Stores the user id
+					int found = 0; // Stores a boolean to check if any transport was removed
+
+					// Get the user id
+					printf("Id do utilizador que é para remover dos vertices: ");
+					scanf("%d", &user_id);
+
+					// Goes through all the vertices and removes all the users with the same id
+					for (int i = 0; i < *vertices_size; i++) {
+						if (remove_vertex_user((*loaded_vertices)[i], user_id)) found = 1;
+					}
+
+					// Check if the user was removed
+					if (!found) printf("Não foi possivel remover o utilizador\n");
+				}
+				break;
+			case 15:
+				store_users(loaded_users, 0);
+				store_transports(loaded_transport, 0);
+				store_graph(loaded_graph, 0);
+				store_vertices(*loaded_vertices, *vertices_size, 0);
+				break;
+			case 16:
 				break;
 			default:
 				// If the user's choice is invalid, print an error message
 				printf("Escolha invalida!\n\n");
 		}
 
-	} while (choice != 7);
+	} while (choice != 16);
 }
 #pragma endregion
 
@@ -110,65 +344,6 @@ int main() {
 	setlocale(LC_ALL, "Portuguese");
 	setlocale(LC_NUMERIC, "English"); // Effects the decimal point formatting so its "." and not ",";
 	
-	Graph* loaded_graph = (Graph*)malloc(sizeof(Graph));
-	loaded_graph->geocode = NULL;
-	loaded_graph->edge = NULL;
-	loaded_graph->next = NULL;
-
-	/*insert_node(loaded_graph, "acabam.gols.durou");
-	insert_node(loaded_graph, "latões.matos.sacos");
-	insert_node(loaded_graph, "doçura.molho.idades");*/
-
-	int array_size = 3;
-	Vertex** array = (Vertex*)malloc(array_size+1 * sizeof(Vertex));
-	/*array[0] = create_vertex("acabam.gols.durou");
-	array[1] = create_vertex("latões.matos.sacos");
-	array[2] = create_vertex("doçura.molho.idades");*/
-
-	/*insert_edge(loaded_graph, array[1], "acabam.gols.durou", 10);
-	insert_edge(loaded_graph, array[2], "acabam.gols.durou", 24);
-	insert_edge(loaded_graph, array[0], "latões.matos.sacos", 3);
-	insert_edge(loaded_graph, array[1], "doçura.molho.idades", 20);*/
-
-	Transport* loaded_transports = (Transport*)malloc(sizeof(Transport));
-	loaded_transports->next = NULL;
-	loaded_transports = read_transports(loaded_transports, 0);
-
-	User* loaded_users = (User*)malloc(sizeof(User));
-	loaded_users->next = NULL;
-	loaded_users = read_users(loaded_users, 0);
-
-	/*add_vertex_transport(array[0], loaded_transports);
-	add_vertex_transport(array[0], loaded_transports->next->next);
-	add_vertex_transport(array[1], loaded_transports->next);*/
-
-	/*add_vertex_users(array[0], loaded_users);
-	add_vertex_users(array[2], loaded_users->next);
-	add_vertex_users(array[2], loaded_users->next->next);*/
-
-	//remove_node(&loaded_graph, "4");
-	//remove_edge(&loaded_graph, array[0], "1");
-	//array_size = remove_vertex(&loaded_graph, array[1], array, array_size);
-	//remove_vertex_transport(array[1], 2);
-
-	/*store_graph(loaded_graph, 1);
-	store_vertices(array, array_size, 1);*/
-
-	array = read_vertices(array, &array_size, loaded_transports, loaded_users, 1);
-	loaded_graph = read_graph(loaded_graph, array, array_size, 1);
-
-	int vertices_size = 2;
-	Vertex** vertices = get_nearest_vertices(loaded_graph, &vertices_size,user_geodode(array, array_size, 1), 50);
-	for (int i = 0; i < vertices_size - 2; i++) {
-		for (int j = 0; j < vertices[i]->transport_quantity; j++) {
-			if (strcmp(vertices[i]->transports[j]->type, "Trotinete") == 0)
-				printf("Id: %d, Geocódigo: %s, Tipo: %s, Bateria: %d\n", vertices[i]->transports[j]->id, vertices[i]->geocode, vertices[i]->transports[j]->type, vertices[i]->transports[j]->battery);
-		}
-	}
-	free(vertices);
-
-
-	/*
 	// Load the users into the memory
 	User* loaded_users = (User*)malloc(sizeof(User));
 	loaded_users->next = NULL;
@@ -225,6 +400,20 @@ int main() {
 
 	loaded_transports = read_transports(loaded_transports, 0);
 
+	// Load the vertices into the memory
+	int vertices_size = 2;
+	Vertex** loaded_vertices = (Vertex*)malloc(vertices_size * sizeof(Vertex));
+
+	loaded_vertices = read_vertices(loaded_vertices, &vertices_size, loaded_transports, loaded_users, 0);
+
+	// Load the graph into the memory
+	Graph* loaded_graph = (Graph*)malloc(sizeof(Graph));
+	loaded_graph->geocode = NULL;
+	loaded_graph->edge = NULL;
+	loaded_graph->next = NULL;
+
+	loaded_graph = read_graph(loaded_graph, loaded_vertices, vertices_size, 0);
+
 	do{
 		// Print menu
 		printf("\nMenu:\n");
@@ -233,11 +422,12 @@ int main() {
 		printf("3. Editar dados do utilizador\n");
 		printf("4. Alugar um meio de transporte\n");
 		printf("5. Adicionar saldo\n");
+		printf("6. Meios de transporte num raio\n");
 
 		// Check if the user is a manager
-		if (user_type) printf("7. Menu de gestores\n");
+		if (user_type) printf("8. Menu de gestores\n");
 
-		printf("6. Sair\n");
+		printf("7. Sair\n");
 		printf("_________________________________\n");
 		printf("Insira a sua escolha: ");
 
@@ -292,7 +482,11 @@ int main() {
 				}
 				break;
 			case 3:
-				edit_user(&loaded_users, id);
+				{
+					User* edited_user = edit_user(&loaded_users, id);
+					printf("Nome: %s, Residencia: %s, NIF: %s\n",
+						edited_user->name, edited_user->residency, edited_user->NIF);
+				}
 				break;
 			case 4:
 				{ // Use of curly brackets because you can't declare a variable inside a case statement
@@ -305,7 +499,7 @@ int main() {
 					scanf("%d", &transport_id);
 					getchar();
 
-					if (validate_transport(loaded_transports, transport_id)) store_rental(&loaded_users, loaded_transports, id, transport_id, 0);
+					if (get_transport(loaded_transports, transport_id) != NULL) store_rental(&loaded_users, loaded_transports, id, transport_id, 0);
 					else printf("Meio de tranporte não encontrado.\n");
 				}
 				break;
@@ -313,10 +507,48 @@ int main() {
 				add_balance(&loaded_users, id, 0);
 				break;
 			case 6:
+				{
+					float searched_radius = 0;				 // Stores the radius the user will search for transports
+					char searched_type[MAX_LINE_LENGTH / 3]; // Stores the transport type searched
+
+					// Get radius
+					printf("Qual é o raio que quer procurar por um meio de transporte?\n");
+					scanf("%f", &searched_radius);
+					getchar(); // Get the new line character
+
+					// Get the type
+					printf("Qual o tipo de transporte a procurar?\n");
+					fgets(searched_type, MAX_LINE_LENGTH / 3, stdin);
+					newline_remove(searched_type);
+					
+					// Get the tranports in the radius
+					int near_vertices_size = 2, has_transport = 0;
+					Vertex** near_vertices = get_nearest_vertices(loaded_graph, &near_vertices_size, user_geodode(loaded_vertices, vertices_size, id), searched_radius);
+					
+					// Go through the vertices and transports array
+					for (int i = 0; i < near_vertices_size - 2; i++) {
+						for (int j = 0; j < near_vertices[i]->transport_quantity; j++) {
+
+							// Check if its the transport type searched
+							if (strcmp(near_vertices[i]->transports[j]->type, searched_type) == 0) {
+
+								// Print the transporte info
+								printf("Id: %d, Geocódigo: %s, Tipo: %s, Bateria: %d\n", near_vertices[i]->transports[j]->id, near_vertices[i]->geocode, near_vertices[i]->transports[j]->type, near_vertices[i]->transports[j]->battery);
+								has_transport = 1;
+							}	
+						}
+					}
+					free(near_vertices);
+
+					// Print if no transport was found
+					if (!has_transport) printf("Nenhum transporte foi encontrado.\n");
+				}
 				break;
 			case 7:
+				break;
+			case 8:
 				if (user_type) {
-					manager_menu(loaded_users, loaded_transports);
+					manager_menu(loaded_users, loaded_transports, loaded_graph, &loaded_vertices, &vertices_size);
 					break;
 				}
 			default:
@@ -324,8 +556,8 @@ int main() {
 				printf("Escolha invalida!\n");
 		}
 
-	} while (choice != 6);
-	*/
+	} while (choice != 7);
+	
 	return 0;
 }
 #pragma endregion

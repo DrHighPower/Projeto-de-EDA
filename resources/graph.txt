@@ -1,4 +1,4 @@
-acabam.gols.durou;latões.matos.sacos;10.00
-acabam.gols.durou;doçura.molho.idades;24.00
-latões.matos.sacos;acabam.gols.durou;3.00
-doçura.molho.idades;latões.matos.sacos;20.00
+acabam.gols.durou;latoes.matos.sacos;10.00
+acabam.gols.durou;docura.molho.idades;24.00
+latoes.matos.sacos;acabam.gols.durou;3.00
+docura.molho.idades;latoes.matos.sacos;20.00
