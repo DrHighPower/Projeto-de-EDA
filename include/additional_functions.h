@@ -63,4 +63,13 @@ void newline_remove(char* string);
  */
 char* add_minutes(const char* time, const char* date, int minutes);
 
+/**
+ * @brief Verifica se uma determinada string está presente em um vetor de strings.
+ *
+ * @param array O vetor de strings que vai ser procurado.
+ * @param array_size O tamanho do vetor de strings.
+ * @param string A string a ser procurada.
+ *
+ * @return Se a função for bem sucedida é devolvido 1, se não é devolvido 0.
+ */
 int has_string(char** array, int array_size, char* string);

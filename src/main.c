@@ -71,7 +71,8 @@ void manager_menu(User* loaded_users, Transport* loaded_transport, Graph* loaded
 		printf("13. Adicionar utilizador a um vertice\n");
 		printf("14. Remover utilizador de um vertice\n");
 		printf("15. Salvar alterações\n");
-		printf("16. Sair\n");
+		printf("16. Caminho para remover os meios de transporte\n");
+		printf("17. Sair\n");
 		printf("_________________________________\n");
 		printf("Insira a sua escolha: ");
 
@@ -329,6 +330,36 @@ void manager_menu(User* loaded_users, Transport* loaded_transport, Graph* loaded
 				store_vertices(*loaded_vertices, *vertices_size, 0);
 				break;
 			case 16:
+				{
+					char start_vertex[MAX_LINE_LENGTH / 3]; // Stores the starting position
+					float truck_volume = 0;					// Stores the max truck volume
+					int circuit_size = 0;					// Stores the size of the circuit
+
+					// Get the starting point
+					printf("Ponto de partida: ");
+					fgets(start_vertex, MAX_LINE_LENGTH / 3, stdin);
+					newline_remove(start_vertex);
+
+					while (truck_volume < 2) {
+						// Get the truck volume
+						printf("Volume maximo em metros cúbicos do camião: ");
+						scanf("%f", &truck_volume);
+
+						if (truck_volume < 2) printf("O volume do camião tem de ser 2 ou mais metros cúbicos!\n");
+					}
+
+					// Get the circuit
+					char** circuit = shortest_circuit(loaded_graph, *loaded_vertices, *vertices_size, start_vertex, truck_volume, &circuit_size);
+
+					// Print the circuit
+					for (int i = 0; i < circuit_size; i++) {
+						printf("%s", circuit[i]);
+
+						if (i != circuit_size - 1) printf(" -> ");
+					}
+				}
+				break;
+			case 17:
 				break;
 			default:
 				// If the user's choice is invalid, print an error message
@@ -349,53 +380,6 @@ int main() {
 	loaded_users->next = NULL;
 
 	loaded_users = read_users(loaded_users, 0);
-
-	Transport* loaded_transports = (Transport*)malloc(sizeof(Transport));
-	loaded_transports->next = NULL;
-
-	loaded_transports = read_transports(loaded_transports, 0);
-
-	int vertices_size = 2;
-	Vertex** loaded_vertices = (Vertex*)malloc(vertices_size * sizeof(Vertex));
-
-	loaded_vertices = read_vertices(loaded_vertices, &vertices_size, loaded_transports, loaded_users, 0);
-
-	Graph* loaded_graph = (Graph*)malloc(sizeof(Graph));
-	loaded_graph->geocode = NULL;
-	loaded_graph->edge = NULL;
-	loaded_graph->next = NULL;
-
-	loaded_graph = read_graph(loaded_graph, loaded_vertices, vertices_size, 0);
-
-
-	char* start_vertex = (char*)malloc(MAX_LINE_LENGTH / 3 * sizeof(char));
-	strcpy(start_vertex, "babado.velhas.prego");
-
-	int circuit_size = 0;
-	char** circuit = shortest_circuit(loaded_graph, loaded_vertices, vertices_size, start_vertex, 4, &circuit_size);
-	for (int i = 0; i < circuit_size; i++) {
-		printf("%s -> ", circuit[i]);
-	}
-
-	/*for (int i = 0; i < vertices_size; i++) {
-		for (int j = 0; j < vertices_size; j++) {
-
-			int path_size = 2;
-			int path_pos = 0;
-			char** path = (char*)malloc(path_size * sizeof(char));
-			float test = shortest_path(loaded_graph, &path, loaded_vertices[i]->geocode, loaded_vertices[j]->geocode, vertices_size, &path_size, &path_pos);
-			for (int h = 0; h < path_size - 1; h++) {
-				printf("%s -> ", path[h]);
-			}
-			printf("\n%.2f\n", test);
-
-			for (int h = 0; h < path_size - 1; h++) {
-				free(path[h]);
-			}
-		}
-	}*/
-
-	/*
 
 	// Variable that stores the user's choice
 	int choice;
@@ -604,7 +588,7 @@ int main() {
 		}
 
 	} while (choice != 7);
-	*/
+
 	return 0;
 }
 #pragma endregion

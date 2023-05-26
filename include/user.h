@@ -150,10 +150,18 @@ User* edit_user(User** head, int id);
  * @param head A lista ligada a ser percorrida.
  * @param id O código unico do utilizador que se vai obter o nivel de acesso.
  *
- * @return O nivel de acesso do utilizador, se o o código não tiver utilizador correspondente é devolvido -1;
+ * @return O nivel de acesso do utilizador, se o código não tiver utilizador correspondente é devolvido -1.
  */
 int get_user_type(User* head, int id);
 
+/**
+ * @brief Obtém um utilizador com o código inserido de uma lista ligada.
+ *
+ * @param head A lista ligada a ser percorrida.
+ * @param id O código unico do utilizador.
+ *
+ * @return Um apontador para o utilizador com o código unico, se  o código não tiver utilizador correspondente é devolvido NULL.
+ */
 User* get_user(User* head, int id);
 
 /**

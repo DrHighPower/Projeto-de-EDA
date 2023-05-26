@@ -13,6 +13,16 @@
 #define MAX_GEOCODE 64
 #define MAX_DISTANCE 9999
 
+#pragma region FreeEdgeList
+/*
+	|--------------------------------------------------------------------------
+	| Free the edge list
+	|--------------------------------------------------------------------------
+	|
+	| Traverses the edge linked list and frees each node and makes
+	| the first node NULL.
+	|
+*/
 void free_edge_list(Edge** head) {
 	Edge* current = *head;
 	Edge* next;
@@ -24,7 +34,17 @@ void free_edge_list(Edge** head) {
 	}
 	*head = NULL; // Reset the header pointer
 }
+#pragma endregion
 
+#pragma region FreeGraph
+/*
+	|--------------------------------------------------------------------------
+	| Free the graph
+	|--------------------------------------------------------------------------
+	|
+	| Traverses the graph and frees each vertex and its corresponding edges.
+	|
+*/
 void free_graph(Graph** head) {
 	Graph* current = *head;
 	Graph* next;
@@ -40,7 +60,17 @@ void free_graph(Graph** head) {
 	}
 	*head = NULL; // Reset the header pointer
 }
+#pragma endregion
 
+#pragma region SaveNode
+/*
+	|--------------------------------------------------------------------------
+	| Save node
+	|--------------------------------------------------------------------------
+	|
+	| Saves the geocode in its corresponding data structure member.
+	|
+*/
 void save_node(Graph* current, char* geocode) {
 	current->geocode = (char*)malloc(MAX_LINE_LENGTH / 3 * sizeof(char));
 	strcpy(current->geocode, geocode);
@@ -48,7 +78,18 @@ void save_node(Graph* current, char* geocode) {
 	current->edge = NULL;
 	current->next = NULL;
 }
+#pragma endregion
 
+#pragma region InsertNode
+/*
+	|--------------------------------------------------------------------------
+	| Insert node
+	|--------------------------------------------------------------------------
+	|
+	| Inserts a new vertex in the graph at the last node in the linked list.
+	| Returns a boolean value accordingly.
+	|
+*/
 int insert_node(Graph* head, char* geocode) {
 	Graph* current = head;
 
@@ -71,7 +112,19 @@ int insert_node(Graph* head, char* geocode) {
 
 	return 1;
 }
+#pragma endregion
 
+#pragma region RemoveNode
+/*
+	|--------------------------------------------------------------------------
+	| Remove node
+	|--------------------------------------------------------------------------
+	|
+	| Removes a vertex in the graph from its linked list, 
+	| using the vertex geocode.
+	| Returns a boolean value accordingly.
+	|
+*/
 int remove_node(Graph** head, char* geocode) {
 	Graph* current = *head;
 
@@ -102,7 +155,18 @@ int remove_node(Graph** head, char* geocode) {
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region InsertEdge
+/*
+	|--------------------------------------------------------------------------
+	| Insert edge
+	|--------------------------------------------------------------------------
+	|
+	| Inserts a new edge at the last node in the linked list.
+	| Returns a boolean value accordingly.
+	|
+*/
 int insert_edge(Graph* head, Vertex* vertex, char* from, float weight) {
 	Graph* current = head;
 
@@ -150,7 +214,18 @@ int insert_edge(Graph* head, Vertex* vertex, char* from, float weight) {
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region EditEdge
+/*
+	|--------------------------------------------------------------------------
+	| Edit edge
+	|--------------------------------------------------------------------------
+	|
+	| Edits an edge in a graph.
+	| Returns a boolean value accordingly.
+	|
+*/
 int edit_edge(Graph** head, Vertex* vertex, char* from, float weight) {
 	Graph* current = *head;
 
@@ -179,7 +254,18 @@ int edit_edge(Graph** head, Vertex* vertex, char* from, float weight) {
 	}
 	return 0;
 }
+#pragma endregion
 
+#pragma region RemoveEdge
+/*
+	|--------------------------------------------------------------------------
+	| Remove edge
+	|--------------------------------------------------------------------------
+	|
+	| Removes an edge from a graph.
+	| Returns a boolean value accordingly.
+	|
+*/
 int remove_edge(Graph** head, Vertex* vertex, char* from) {
 	Graph* current = *head;
 
@@ -222,7 +308,19 @@ int remove_edge(Graph** head, Vertex* vertex, char* from) {
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region CreateVertex
+/*
+	|--------------------------------------------------------------------------
+	| Create vertex
+	|--------------------------------------------------------------------------
+	|
+	| Dynamically allocates memory to the new vertex, saving the 
+	| inserted geocode.
+	| Returns a pointer to the new vertex.
+	|
+*/
 Vertex* create_vertex(char* geocode) {
 	Vertex* new_vertex = (Vertex*)malloc(sizeof(Vertex));
 	new_vertex->geocode = (char*)malloc(MAX_LINE_LENGTH / 3 * sizeof(char));
@@ -237,7 +335,19 @@ Vertex* create_vertex(char* geocode) {
 
 	return new_vertex;
 }
+#pragma endregion
 
+#pragma region RemoveVertex
+/*
+	|--------------------------------------------------------------------------
+	| Remove vertex
+	|--------------------------------------------------------------------------
+	|
+	| Removes the graph vertex along with all edges connected to it, 
+	| also updates the array of vertices.
+	| Returns the updated size of the vertex array after removal.
+	|
+*/
 int remove_vertex(Graph** head, Vertex* vertex, Vertex** vertices, int array_size) {
 
 	if (*head != NULL) {
@@ -262,7 +372,19 @@ int remove_vertex(Graph** head, Vertex* vertex, Vertex** vertices, int array_siz
 	// Return the new array size
 	return --array_size;
 }
+#pragma endregion
 
+#pragma region AddVertexTransport
+/*
+	|--------------------------------------------------------------------------
+	| Add a transport to a vertex
+	|--------------------------------------------------------------------------
+	|
+	| Adds a given transport to a vertex, updating the geocode 
+	| of the transport.
+	| Returns a pointer to the updated vertex.
+	|
+*/
 Vertex* add_vertex_transport(Vertex* vertex, Transport* transport) {
 
 	// Change the transport geocode
@@ -275,7 +397,18 @@ Vertex* add_vertex_transport(Vertex* vertex, Transport* transport) {
 
 	return vertex;
 }
+#pragma endregion
 
+#pragma region AddVertexUsers
+/*
+	|--------------------------------------------------------------------------
+	| Add a user to a vertex
+	|--------------------------------------------------------------------------
+	|
+	| Adds a given user to a vertex.
+	| Returns a pointer to the updated vertex.
+	|
+*/
 Vertex* add_vertex_users(Vertex* vertex, User* user) {
 	vertex->user_quantity++;
 	vertex->users = (User*)realloc(vertex->users, vertex->user_quantity * sizeof(User));
@@ -283,7 +416,19 @@ Vertex* add_vertex_users(Vertex* vertex, User* user) {
 
 	return vertex;
 }
+#pragma endregion
 
+#pragma region RemoveVertexTransport
+/*
+	|--------------------------------------------------------------------------
+	| Remove a transport from a vertex
+	|--------------------------------------------------------------------------
+	|
+	| Removes a transport by its id from a given vertex, also decreasing 
+	| the 'transport_quantity' of the vertex.
+	| Returns a boolean value accordingly.
+	|
+*/
 int remove_vertex_transport(Vertex* vertex, int id) {
 
 	// Checks if the element was found
@@ -301,7 +446,19 @@ int remove_vertex_transport(Vertex* vertex, int id) {
 	}
 	else return 0;
 }
+#pragma endregion
 
+#pragma region RemoveVertexUser
+/*
+	|--------------------------------------------------------------------------
+	| Remove a user from a vertex
+	|--------------------------------------------------------------------------
+	|
+	| Removes a user by its id from a given vertex, also decreasing
+	| the 'user_quantity' of the vertex.
+	| Returns a boolean value accordingly.
+	|
+*/
 int remove_vertex_user(Vertex* vertex, int id) {
 
 	// Checks if the element was found
@@ -319,7 +476,18 @@ int remove_vertex_user(Vertex* vertex, int id) {
 	}
 	else return 0;
 }
+#pragma endregion
 
+#pragma region StoreGraph
+/*
+	|--------------------------------------------------------------------------
+	| Store graph
+	|--------------------------------------------------------------------------
+	|
+	| Stores each graph node in a different line of a file.
+	| Returns a boolean value accordingly.
+	|
+*/
 int store_graph(Graph* head, int bool) {
 	FILE* fp;
 
@@ -351,7 +519,18 @@ int store_graph(Graph* head, int bool) {
 
 	return 1;
 }
+#pragma endregion
 
+#pragma region StoreVertices
+/*
+	|--------------------------------------------------------------------------
+	| Store vertices
+	|--------------------------------------------------------------------------
+	|
+	| Stores each vertex in a different line of a file.
+	| Returns a boolean value accordingly.
+	|
+*/
 int store_vertices(Vertex** vertices, int vertex_size, int bool) {
 	FILE* fp;
 
@@ -397,7 +576,18 @@ int store_vertices(Vertex** vertices, int vertex_size, int bool) {
 
 	return 1;
 }
+#pragma endregion
 
+#pragma region ReadGraph
+/*
+	|--------------------------------------------------------------------------
+	| Read graph
+	|--------------------------------------------------------------------------
+	|
+	| Reads the graph from a file and saves each one to a graph node.
+	| Returns a pointer to the read graph.
+	|
+*/
 Graph* read_graph(Graph* head, Vertex** vertex, int vertex_size, int bool){
 	FILE* fp;
 
@@ -452,7 +642,18 @@ Graph* read_graph(Graph* head, Vertex** vertex, int vertex_size, int bool){
 
 	return current;
 }
+#pragma endregion
 
+#pragma region ReadVertices
+/*
+	|--------------------------------------------------------------------------
+	| Read vertices
+	|--------------------------------------------------------------------------
+	|
+	| Reads the graph vertices from a file and creates a vertex array.
+	| Returns a pointer to the array of vertices.
+	|
+*/
 Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports, User* users, int bool) {
 	FILE* fp;
 
@@ -522,7 +723,18 @@ Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports,
 
 	return vertex;
 }
+#pragma endregion
 
+#pragma region UserGeocode
+/*
+	|--------------------------------------------------------------------------
+	| User's geocode
+	|--------------------------------------------------------------------------
+	|
+	| Returns the geocode of the vertex that contains the 
+	| user that is associated with the id given.
+	|
+*/
 char* user_geodode(Vertex** vertex, int vertex_size, int id) {
 	// Go through the vertex array
 	for (int i = 0; i < vertex_size; i++) {
@@ -536,7 +748,19 @@ char* user_geodode(Vertex** vertex, int vertex_size, int id) {
 	// Return NULL if the user is not found
 	return NULL;
 }
+#pragma endregion
 
+#pragma region NearestVertices
+/*
+	|--------------------------------------------------------------------------
+	| Nearest vertices
+	|--------------------------------------------------------------------------
+	|
+	| Recursive function that searches a graph and returns the 
+	| closest vertices within a radius from a choosen location.
+	| Returns the array of the closest vertices.
+	|
+*/
 Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, int* vertices_pos, char* location, float radius, float travelled, char*** geocodes_array, int* geocodes_size, int* geocodes_pos) {
 	Graph* current_location = head;
 
@@ -583,7 +807,19 @@ Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, i
 
 	return *vertices;
 }
+#pragma endregion
 
+#pragma region GetNearestVertices
+/*
+	|--------------------------------------------------------------------------
+	| Get the nearest vertices
+	|--------------------------------------------------------------------------
+	|
+	| The settings function for the 'nearest_vertices' function.
+	| Returns the array of closest vertices, or NULL if a valid 
+	| location is not entered.
+	|
+*/
 Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, float radius) {
 	
 	// Check if it has a possible location
@@ -608,7 +844,19 @@ Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, float rad
 
 	return vertices;
 }
+#pragma endregion
 
+#pragma region GetVertexPos
+/*
+	|--------------------------------------------------------------------------
+	| Get the vertex position
+	|--------------------------------------------------------------------------
+	|
+	| Searches for a vertex by its geocode in the inserted graph, 
+	| returning its position in the linked list of the graph.
+	| Returns the position of the vertex, if not found, -1 is returned.
+	|
+*/
 int get_vertex_pos(Graph* head, char* geocode) {
 	Graph* current = head;
 	int pos = 0;
@@ -623,7 +871,20 @@ int get_vertex_pos(Graph* head, char* geocode) {
 	if (current == NULL) return -1;
 	else return pos;
 }
+#pragma endregion
 
+#pragma region ShortestDistance
+/*
+	|--------------------------------------------------------------------------
+	| Shortest distance
+	|--------------------------------------------------------------------------
+	|
+	| Calculates the geocode of a vertex that has the shortest distance 
+	| from the current vertex.
+	| Returns the vertex geocode with the shortest distance 
+	| from the current location.
+	|
+*/
 char* shortest_distance(Graph* graph_head, Edge* edge_head, float* distances, int* visited, int current_pos, int vertices_quant) {
 	Edge* current_edge = edge_head;
 
@@ -659,7 +920,20 @@ char* shortest_distance(Graph* graph_head, Edge* edge_head, float* distances, in
 	for (int i = 0; i < closest_position; i++) current_graph = current_graph->next;
 	return current_graph->geocode;
 }
+#pragma endregion
 
+#pragma region GetPath
+/*
+	|--------------------------------------------------------------------------
+	| Get the path between two vertices
+	|--------------------------------------------------------------------------
+	|
+	| Recursively searches for a path between two vertices in the 
+	| inserted graph, exploring adjacent vertices starting from the current 
+	| location, considering the given radius and the distance traveled.
+	| If the path is found, 1 is returned, otherwise 0 is returned.
+	|
+*/
 int get_path(Graph* head, char** geocodes, int geocodes_size, char*** path, int* path_size, int path_pos, float radius, float travelled, int iteration, char* location, char* destination, int* found) {
 	Graph* current_location = head;
 
@@ -707,7 +981,20 @@ int get_path(Graph* head, char** geocodes, int geocodes_size, char*** path, int*
 
 	return 0;
 }
+#pragma endregion
 
+#pragma region ShortestPath
+/*
+	|--------------------------------------------------------------------------
+	| Shortest path
+	|--------------------------------------------------------------------------
+	|
+	| Calculates the shortest path between two vertices in the graph 
+	| using Dijkstra's algorithm.
+	| Returns the total distance traveled on the shortest path, 
+	| or -1 if no path is found.
+	|
+*/
 float shortest_path(Graph* head, char*** path, char* from, char* to, int vertices_quant, int* path_size, int* path_pos) {
 	
 	// Get the source vertex position
@@ -782,7 +1069,18 @@ float shortest_path(Graph* head, char*** path, char* from, char* to, int vertice
 	
 	return -1;
 }
+#pragma endregion
 
+#pragma region ReducedBattery
+/*
+	|--------------------------------------------------------------------------
+	| Get the vertices with transports that have 50% battery or less
+	|--------------------------------------------------------------------------
+	|
+	| Returns a array of vertices with transport that have 50% 
+	| or less battery.
+	|
+*/
 Vertex** reduced_battery(Vertex** vertices, int vertices_quant, int* new_vertices_size) {
 
 	// Stores the vertices position
@@ -822,7 +1120,21 @@ Vertex** reduced_battery(Vertex** vertices, int vertices_quant, int* new_vertice
 
 	return new_vertices;
 }
+#pragma endregion
 
+#pragma region ShortestCircuit
+/*
+	|--------------------------------------------------------------------------
+	| Shortest circuit with transports on low battery
+	|--------------------------------------------------------------------------
+	|
+	| Calculates the shortest circuit that visits vertices with transports 
+	| with low battery levels. A combination of shortest path calculations 
+	| and volume constraints is used to determine the circuit.
+	| When necessary, it returns to the starting point to empty the truck.
+	| Returns a array of geocodes representing the shortest circuit.
+	|
+*/
 char** shortest_circuit(Graph* head, Vertex** vertices, int vertices_quant, char* start, float truck_volume, int* circuit_size) {
 	
 	// Get the vertices with the transports that have a reduced battery
@@ -952,3 +1264,4 @@ char** shortest_circuit(Graph* head, Vertex** vertices, int vertices_quant, char
 	*circuit_size = path_size - 1;
 	return path;
 }
+#pragma endregion

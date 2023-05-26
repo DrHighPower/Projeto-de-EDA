@@ -71,7 +71,7 @@ void save_user(User* current, int id, float balance, char* name, char* residency
 	| Stores each node of the linked list on a different line in a file.
 	| If the bool parameter is 0 it stores the info inside a binary file,
 	| if the bool parameter is 1 it stores the info inside a text file.
-	| Return a boolean value accordingly.
+	| Returns a boolean value accordingly.
 	|
 */
 int store_users(User* head, int bool) {
@@ -424,6 +424,17 @@ int get_user_type(User* head, int id) {
 }
 #pragma endregion
 
+#pragma region GetUser
+/*
+	|--------------------------------------------------------------------------
+	| Get user by id
+	|--------------------------------------------------------------------------
+	|
+	| Gets a user with the inserted id from a linked list.
+	| Returns a pointer to the user with the id, if the id has no 
+	| corresponding user, NULL is returned.
+	|
+*/
 User* get_user(User* head, int id) {
 	User* current = head;
 
@@ -434,6 +445,7 @@ User* get_user(User* head, int id) {
 
 	return NULL;
 }
+#pragma endregion
 
 #pragma region AddBalance
 /*

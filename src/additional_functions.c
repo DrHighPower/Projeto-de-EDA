@@ -140,6 +140,16 @@ char* add_minutes(const char* time, const char* date, int minutes) {
 }
 #pragma endregion
 
+#pragma region HasString
+/*
+	|--------------------------------------------------------------------------
+	| Array has string
+	|--------------------------------------------------------------------------
+	|
+	| Checks whether a given string is present in an array of strings.
+	| Returns a boolean value accordingly.
+	|
+*/
 int has_string(char** array, int array_size, char* string) {
 	for (int i = 0; i < array_size; i++) {
 		if (strcmp(array[i], string) == 0) return 1;
@@ -147,3 +157,4 @@ int has_string(char** array, int array_size, char* string) {
 
 	return 0;
 }
+#pragma endregion
