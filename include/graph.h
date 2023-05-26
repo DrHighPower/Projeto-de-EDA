@@ -59,3 +59,10 @@ Vertex** read_vertices(Vertex** vertex, int* vertex_size, Transport* transports,
 char* user_geodode(Vertex** vertex, int vertex_size, int id);
 Vertex** nearest_vertices(Graph* head, Vertex*** vertices, int* vertices_size, int* vertices_pos, char* location, float radius, float travelled, char*** geocodes_array, int* geocodes_size, int* geocodes_pos);
 Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, float radius);
+
+int get_vertex_pos(Graph* head, char* geocode);
+char* shortest_distance(Graph* graph_head, Edge* edge_head, float* distances, int* visited, int current_pos, int vertices_quant);
+int get_path(Graph* head, char** geocodes, int geocodes_size, char*** path, int* path_size, int path_pos, float radius, float travelled, int iteration, char* location, char* destination, int* found);
+float shortest_path(Graph* head, char*** path, char* from, char* to, int vertices_quant, int* path_size, int* path_pos);
+Vertex** reduced_battery(Vertex** vertices, int vertices_quant, int* new_vertices_size);
+char** shortest_circuit(Graph* head, Vertex** vertices, int vertices_quant, char* start, float truck_volume, int* circuit_size);

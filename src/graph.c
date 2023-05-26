@@ -11,6 +11,7 @@
 
 #define MAX_LINE_LENGTH 1024
 #define MAX_GEOCODE 64
+#define MAX_DISTANCE 9999
 
 void free_edge_list(Edge** head) {
 	Edge* current = *head;
@@ -238,18 +239,21 @@ Vertex* create_vertex(char* geocode) {
 }
 
 int remove_vertex(Graph** head, Vertex* vertex, Vertex** vertices, int array_size) {
-	Graph* current = *head;
 
-	// Remove all the edges with the same vertex in the graph
-	while (current != NULL) {
-		remove_edge(&current, vertex, current->geocode);
-		current = current->next;
+	if (*head != NULL) {
+		Graph* current = *head;
+
+		// Remove all the edges with the same vertex in the graph
+		while (current != NULL) {
+			remove_edge(&current, vertex, current->geocode);
+			current = current->next;
+		}
 	}
 
 	// Checks if the element was found
 	int found = 0;
 	for (int i = 0; i < array_size; i++) {
-		if (strcmp(vertices[i]->geocode, vertex->geocode) == 0) found = 1;
+		if (!found && strcmp(vertices[i]->geocode, vertex->geocode) == 0) found = 1;
 
 		// Move every element down, and remove the last
 		if (found && i + 1 <= array_size) vertices[i] = vertices[i + 1];
@@ -389,6 +393,7 @@ int store_vertices(Vertex** vertices, int vertex_size, int bool) {
 		// Store the new line character
 		fprintf(fp, "\n");
 	}
+	fclose(fp);
 
 	return 1;
 }
@@ -602,4 +607,298 @@ Vertex** get_nearest_vertices(Graph* graph, int* size, char* location, float rad
 	free(geocode_array);
 
 	return vertices;
+}
+
+int get_vertex_pos(Graph* head, char* geocode) {
+	Graph* current = head;
+	int pos = 0;
+
+	// Go to the corresponding node
+	while (current != NULL && strcmp(current->geocode, geocode) != 0) {
+		current = current->next;
+		pos++;
+	}
+
+	// Return the position if vertex is found
+	if (current == NULL) return -1;
+	else return pos;
+}
+
+char* shortest_distance(Graph* graph_head, Edge* edge_head, float* distances, int* visited, int current_pos, int vertices_quant) {
+	Edge* current_edge = edge_head;
+
+	float closest_weigth = MAX_DISTANCE;
+	int closest_position = current_pos;
+
+	// Store the distances
+	while (current_edge != NULL) {
+		if (current_edge->weight < MAX_DISTANCE) {
+			
+			// Get the closest distance
+			int vertex_pos = get_vertex_pos(graph_head, current_edge->vertex->geocode);
+
+			if(!visited[vertex_pos] && 
+				(distances[vertex_pos] == MAX_DISTANCE || distances[vertex_pos] > current_edge->weight + distances[current_pos]))
+				distances[vertex_pos] = current_edge->weight + distances[current_pos];
+		}
+
+		current_edge = current_edge->next;
+	}
+
+	// Get the closest vertex
+	for (int i = 0; i < vertices_quant; i++) {
+		if (distances[i] < closest_weigth && !visited[i]) {
+			closest_weigth = distances[i];
+			closest_position = i;
+		}
+	}
+	visited[closest_position] = 1; // Choose the vertex
+
+	// Return the closest geocode
+	Graph* current_graph = graph_head;
+	for (int i = 0; i < closest_position; i++) current_graph = current_graph->next;
+	return current_graph->geocode;
+}
+
+int get_path(Graph* head, char** geocodes, int geocodes_size, char*** path, int* path_size, int path_pos, float radius, float travelled, int iteration, char* location, char* destination, int* found) {
+	Graph* current_location = head;
+
+	// Go to the corresponding node in the graph
+	while (strcmp(current_location->geocode, location) != 0)
+		current_location = current_location->next;
+
+	Edge* current_edge = current_location->edge;
+
+	iteration++; // Add to the iterartion
+
+	// Go through the adjacent vertices
+	while (current_edge != NULL) {
+
+		if (current_edge->weight + travelled <= radius && has_string(geocodes, geocodes_size, current_edge->vertex->geocode)) {
+
+			// Enter a recursive function
+			get_path(head, geocodes, geocodes_size, path, path_size, path_pos, radius, current_edge->weight + travelled, iteration, current_edge->vertex->geocode, destination, found);
+
+			if (strcmp(destination, current_edge->vertex->geocode) == 0) {
+				*found = 1; // Destination found
+
+				// Reallocate memory for the array
+				*path_size = *path_size + iteration;
+				*path = (char**)realloc(*path, *path_size * sizeof(char*));
+
+				// Allocate memory for the string
+				(*path)[path_pos + iteration] = (char*)malloc(MAX_GEOCODE * sizeof(char));
+				strcpy((*path)[path_pos + iteration], current_edge->vertex->geocode);
+
+				return 1;
+			}
+			else if (*found == 1) {
+				// Allocate memory for the string
+				(*path)[path_pos + iteration] = (char*)malloc(MAX_GEOCODE * sizeof(char));
+				strcpy((*path)[path_pos + iteration], current_edge->vertex->geocode);
+
+				return 1;
+			}
+
+		}
+
+		current_edge = current_edge->next;
+	}
+
+	return 0;
+}
+
+float shortest_path(Graph* head, char*** path, char* from, char* to, int vertices_quant, int* path_size, int* path_pos) {
+	
+	// Get the source vertex position
+	int vertex_pos = get_vertex_pos(head, from);
+	if (vertex_pos == -1) return -1;
+
+	// Store the distance and visited vertices
+	float* distances = (float*)malloc(vertices_quant * sizeof(float));
+	int* visited = (int*)malloc(vertices_quant * sizeof(int));
+
+	for (int i = 0; i < vertices_quant; i++) {
+		distances[i] = MAX_DISTANCE;
+		visited[i] = 0;
+	}
+	
+	distances[vertex_pos] = 0;
+	visited[vertex_pos] = 1;
+
+	char* closest_geocode = (char*)malloc(MAX_GEOCODE * sizeof(char));
+	strcpy(closest_geocode, from);
+
+	for (int i = 0; i < vertices_quant; i++) {
+
+		// Get the corresponding node
+		Graph* current = head;
+		while (current != NULL && strcmp(current->geocode, closest_geocode) != NULL) current = current->next;
+		if (current == NULL) return -1;
+
+		// Chooses between the adjacent nodes
+		if (strcmp(from, to) == 0) closest_geocode = string_dup(to);
+		else closest_geocode = string_dup(shortest_distance(head, current->edge, distances, visited, vertex_pos, vertices_quant));		
+
+		
+		// Checks if the destination was found
+		vertex_pos = get_vertex_pos(head, closest_geocode);
+		if (strcmp(closest_geocode, to) == 0) {
+
+			// Stores the visited vertices geocode
+			int geocodes_pos = 0;
+			char** geocodes = (char**)malloc(i+2 * sizeof(char*));
+
+			// Store the visited nodes
+			current = head;
+			for (int j = 0; j < vertices_quant; j++) {
+				if (visited[j] == 1) {
+					// Allocate memory for the string
+					geocodes[geocodes_pos] = (char*)malloc(MAX_GEOCODE * sizeof(char));
+					strcpy(geocodes[geocodes_pos], current->geocode);
+					geocodes_pos++;
+				}
+				current = current->next;
+			}
+
+			// Get the path traveled
+			int found = 0;
+			get_path(head, geocodes, geocodes_pos, path, path_size, *path_pos, distances[vertex_pos], 0, 0, from, to, &found);
+			
+			// Add the first location
+			(*path)[*path_pos] = (char*)malloc(MAX_GEOCODE * sizeof(char));
+			strcpy((*path)[*path_pos], from);
+
+			// Stores the distance traveled
+			float distance = distances[vertex_pos];
+
+			// Free the memory
+			free(distances);
+			free(visited);
+			free(closest_geocode);
+
+			return distance;
+		}
+	}
+	
+	return -1;
+}
+
+Vertex** reduced_battery(Vertex** vertices, int vertices_quant, int* new_vertices_size) {
+
+	// Stores the vertices position
+	int new_vertices_pos = 0;
+	Vertex** new_vertices = (Vertex*)malloc(*new_vertices_size * sizeof(Vertex));
+
+	// Go through the vertices
+	for (int i = 0; i < vertices_quant; i++) {
+
+		// Go through the transports
+		for (int j = 0; j < vertices[i]->transport_quantity; j++) {
+
+			// Check if the baterry is 50% or lower
+			if (vertices[i]->transports[j]->battery <= 50) {
+
+				// Allocate memory for the new vertex
+				new_vertices[new_vertices_pos] = (Vertex*)malloc(sizeof(Vertex));
+
+				// Reallocate memory for the array of vertices
+				*new_vertices_size = *new_vertices_size + 1;
+				new_vertices = (Vertex**)realloc(new_vertices, *new_vertices_size * sizeof(Vertex*));
+
+				// Copy the vertices
+				memcpy(new_vertices[new_vertices_pos], vertices[i], sizeof(Vertex));
+				new_vertices_pos++;
+
+				break;
+			}
+		}
+	}
+
+	return new_vertices;
+}
+
+char** shortest_circuit(Graph* head, Vertex** vertices, int vertices_quant, char* start, float truck_volume, int* circuit_size) {
+
+	// Get the vertices with the transports that have a reduced battery
+	int battery_vertices_quant = 2;
+	Vertex** battery_vertices = reduced_battery(vertices, vertices_quant, &battery_vertices_quant);
+
+	// Stores the circuit
+	int path_size = 2;
+	int path_pos = 0;
+	char** path = (char**)malloc(path_size * sizeof(char*));
+
+	while (battery_vertices_quant - 2 != 0) {
+		int shortest_distance = MAX_DISTANCE;
+		int shortest_position = -1;
+
+		for (int i = 0; i < battery_vertices_quant - 2; i++) {
+
+			// Stores the dummy circuit
+			int _path_size = 2;
+			int _path_pos = 0;
+			char** _path = (char**)malloc(_path_size * sizeof(char*));
+
+			// Get the distance between vertices
+			int distance = shortest_path(head, &_path, start, battery_vertices[i]->geocode, vertices_quant, &_path_size, &_path_pos);
+
+			if (distance < shortest_distance) {
+
+				// Check if its not the first
+				if (shortest_distance != MAX_DISTANCE) path_size = 2;
+
+				// Store the shortest distance
+				shortest_distance = distance;
+				shortest_position = i;
+
+				// Free the unnecessary path
+				for (int j = path_pos; j < path_size - 2; j++) free(path[j]);
+
+				// Create a copy of the shortest path
+				path_size = path_size + _path_size - 2;
+				for (int j = path_pos; j < path_size - 1; j++) {
+					if(path_pos != 0) path[j] = string_dup(_path[j - path_pos + 1]);
+					else path[j] = string_dup(_path[j - path_pos]);
+				}
+			}
+
+			// Free the dummy path
+			for (int j = 0; j < _path_size - 1; j++) free(_path[j]);
+		}
+
+		// Store the new position
+		path_pos = path_size - 1;
+
+		// Update the start vertex
+		strcpy(start, battery_vertices[shortest_position]->geocode);
+
+		// Remove the visited vertex
+		Graph* null_graph = NULL;
+		battery_vertices_quant = remove_vertex(&null_graph, battery_vertices[shortest_position], battery_vertices, battery_vertices_quant);
+
+		if (battery_vertices_quant - 2 == 0) {
+
+			// Stores the dummy circuit
+			int _path_size = 2;
+			int _path_pos = 0;
+			char** _path = (char**)malloc(_path_size * sizeof(char*));
+
+			// Get the path to the start
+			shortest_path(head, &_path, start, path[0], vertices_quant, &_path_size, &_path_pos);
+
+			// Create a copy of the shortest path
+			path_size = path_size + _path_size - 2;
+			for (int j = path_pos; j < path_size - 1; j++) {
+				if (path_pos != 0) path[j] = string_dup(_path[j - path_pos + 1]);
+				else path[j] = string_dup(_path[j - path_pos]);
+			}
+
+			// Free the dummy path
+			for (int j = 0; j < _path_size - 1; j++) free(_path[j]);
+		}
+	}
+
+	*circuit_size = path_size - 1;
+	return path;
 }

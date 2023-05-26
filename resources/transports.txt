@@ -1,3 +1,8 @@
 1;100;35;0.30;Bicicleta;acabam.gols.durou;1.5
 2;75;20;0.20;Trotinete;latões.matos.sacos;1.02
-3;80;22;0.20;Trotinete;acabam.gols.durou;1.02
+3;43;22;0.20;Trotinete;acabam.gols.durou;1.02
+4;20;25;0.22;Trotinete;custo.apoio.saborosa;1.02
+5;50;32;0.27;Trotinete;perto.apostila.ensina;1.2
+6;10;28;0.28;Bicicleta;custo.apoio.saborosa;1.5
+7;87;25;0.20;Trotinete;custo.apoio.saborosa;1.05
+8;80;30;0.20;Trotinete;babado.velhas.prego;1.02

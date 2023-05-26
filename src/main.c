@@ -350,6 +350,35 @@ int main() {
 
 	loaded_users = read_users(loaded_users, 0);
 
+	Transport* loaded_transports = (Transport*)malloc(sizeof(Transport));
+	loaded_transports->next = NULL;
+
+	loaded_transports = read_transports(loaded_transports, 0);
+
+	int vertices_size = 2;
+	Vertex** loaded_vertices = (Vertex*)malloc(vertices_size * sizeof(Vertex));
+
+	loaded_vertices = read_vertices(loaded_vertices, &vertices_size, loaded_transports, loaded_users, 0);
+
+	Graph* loaded_graph = (Graph*)malloc(sizeof(Graph));
+	loaded_graph->geocode = NULL;
+	loaded_graph->edge = NULL;
+	loaded_graph->next = NULL;
+
+	loaded_graph = read_graph(loaded_graph, loaded_vertices, vertices_size, 0);
+
+
+	char* start_vertex = (char*)malloc(MAX_LINE_LENGTH / 3 * sizeof(char));
+	strcpy(start_vertex, "latoes.matos.sacos");
+
+	int circuit_size = 0;
+	char** circuit = shortest_circuit(loaded_graph, loaded_vertices, vertices_size, start_vertex, 0, &circuit_size);
+	for (int i = 0; i < circuit_size; i++) {
+		printf("%s -> ", circuit[i]);
+	}
+
+	/*
+
 	// Variable that stores the user's choice
 	int choice;
 
@@ -557,7 +586,7 @@ int main() {
 		}
 
 	} while (choice != 7);
-	
+	*/
 	return 0;
 }
 #pragma endregion
