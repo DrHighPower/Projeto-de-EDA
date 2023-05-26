@@ -775,7 +775,6 @@ float shortest_path(Graph* head, char*** path, char* from, char* to, int vertice
 			// Free the memory
 			free(distances);
 			free(visited);
-			free(closest_geocode);
 
 			return distance;
 		}
@@ -815,51 +814,81 @@ Vertex** reduced_battery(Vertex** vertices, int vertices_quant, int* new_vertice
 		}
 	}
 
+	// Remove the transports with 50% or more
+	for(int i = 0; i < new_vertices_pos; i++)
+		for(int j = 0; j < new_vertices[i]->transport_quantity; j++)
+			if (new_vertices[i]->transports[j]->battery > 50)
+				remove_vertex_transport(new_vertices[i], new_vertices[i]->transports[j]->id);
+
 	return new_vertices;
 }
 
 char** shortest_circuit(Graph* head, Vertex** vertices, int vertices_quant, char* start, float truck_volume, int* circuit_size) {
-
+	
 	// Get the vertices with the transports that have a reduced battery
 	int battery_vertices_quant = 2;
 	Vertex** battery_vertices = reduced_battery(vertices, vertices_quant, &battery_vertices_quant);
+	battery_vertices_quant -= 2;
+
+	float total_volume = 0;	  // Stores the volume of the transports in the truck
+	int total_volume_max = 0; // Stores a boolean that checks if the volume reached its max
 
 	// Stores the circuit
 	int path_size = 2;
+	int preious_path_size = path_size;
 	int path_pos = 0;
-	char** path = (char**)malloc(path_size * sizeof(char*));
+	char** path = (char*)malloc(path_size * sizeof(char));
 
-	while (battery_vertices_quant - 2 != 0) {
-		int shortest_distance = MAX_DISTANCE;
+	while (battery_vertices_quant != 0) {
+		float shortest_distance = MAX_DISTANCE;
 		int shortest_position = -1;
 
-		for (int i = 0; i < battery_vertices_quant - 2; i++) {
+		// Choose wich path to use
+		for (int i = 0; i < battery_vertices_quant; i++) {
 
 			// Stores the dummy circuit
 			int _path_size = 2;
 			int _path_pos = 0;
-			char** _path = (char**)malloc(_path_size * sizeof(char*));
+			char** _path = (char*)malloc(_path_size * sizeof(char));
+
+			// Store the distance between vertices
+			float distance = MAX_DISTANCE;
 
 			// Get the distance between vertices
-			int distance = shortest_path(head, &_path, start, battery_vertices[i]->geocode, vertices_quant, &_path_size, &_path_pos);
-
+			if(!total_volume_max) distance = shortest_path(head, &_path, start, battery_vertices[i]->geocode, vertices_quant, &_path_size, &_path_pos);
+			else distance = shortest_path(head, &_path, start, path[0], vertices_quant, &_path_size, &_path_pos);
+		
 			if (distance < shortest_distance) {
 
 				// Check if its not the first
-				if (shortest_distance != MAX_DISTANCE) path_size = 2;
+				if (shortest_distance != MAX_DISTANCE) path_size = preious_path_size;
 
 				// Store the shortest distance
 				shortest_distance = distance;
 				shortest_position = i;
 
-				// Free the unnecessary path
-				for (int j = path_pos; j < path_size - 2; j++) free(path[j]);
+				// Add the new path size
+				path_size = path_size + _path_size - 2;
+
+				// Reallocate memory for the path
+				path = (char**)realloc(path, path_size * sizeof(char*));
 
 				// Create a copy of the shortest path
-				path_size = path_size + _path_size - 2;
 				for (int j = path_pos; j < path_size - 1; j++) {
-					if(path_pos != 0) path[j] = string_dup(_path[j - path_pos + 1]);
+					if (path_pos != 0) path[j] = string_dup(_path[j - path_pos + 1]);
 					else path[j] = string_dup(_path[j - path_pos]);
+				}
+
+				// Skip the loop
+				if (total_volume_max) {
+					shortest_position = -1;
+					total_volume_max = 0;
+					total_volume = 0;
+
+					// Free the dummy path
+					for (int j = 0; j < _path_size - 1; j++) free(_path[j]);
+
+					break;
 				}
 			}
 
@@ -869,33 +898,54 @@ char** shortest_circuit(Graph* head, Vertex** vertices, int vertices_quant, char
 
 		// Store the new position
 		path_pos = path_size - 1;
-
-		// Update the start vertex
-		strcpy(start, battery_vertices[shortest_position]->geocode);
+		preious_path_size = path_size;
 
 		// Remove the visited vertex
-		Graph* null_graph = NULL;
-		battery_vertices_quant = remove_vertex(&null_graph, battery_vertices[shortest_position], battery_vertices, battery_vertices_quant);
+		if (shortest_position != -1) {
 
-		if (battery_vertices_quant - 2 == 0) {
+			// Update the start vertex
+			strcpy(start, battery_vertices[shortest_position]->geocode);
 
-			// Stores the dummy circuit
-			int _path_size = 2;
-			int _path_pos = 0;
-			char** _path = (char**)malloc(_path_size * sizeof(char*));
+			// Remove the transports from the vertex
+			for (int i = 0; i < battery_vertices[shortest_position]->transport_quantity; i++) {
 
-			// Get the path to the start
-			shortest_path(head, &_path, start, path[0], vertices_quant, &_path_size, &_path_pos);
+				// Stores the transport_volume to be added
+				float new_transport_volume = battery_vertices[shortest_position]->transports[i]->volume;
 
-			// Create a copy of the shortest path
-			path_size = path_size + _path_size - 2;
-			for (int j = path_pos; j < path_size - 1; j++) {
-				if (path_pos != 0) path[j] = string_dup(_path[j - path_pos + 1]);
-				else path[j] = string_dup(_path[j - path_pos]);
+				// Check if the transports fits
+				if (total_volume + new_transport_volume >= truck_volume) {
+					total_volume_max = 1;
+					break;
+				}
+
+				// Check if it can add 2 of the same
+				if (total_volume + new_transport_volume * 2 >= truck_volume) {
+					total_volume_max = 1;
+
+					// Add to the total volume and remove the tranport
+					total_volume += new_transport_volume;
+					remove_vertex_transport(battery_vertices[shortest_position], battery_vertices[shortest_position]->transports[i]->id);
+
+					break;
+				}
+
+				// Add to the total volume and remove the tranport
+				total_volume += new_transport_volume;
+				remove_vertex_transport(battery_vertices[shortest_position], battery_vertices[shortest_position]->transports[i]->id);
 			}
 
-			// Free the dummy path
-			for (int j = 0; j < _path_size - 1; j++) free(_path[j]);
+			// Remove the vertex
+			if (battery_vertices[shortest_position]->transport_quantity == 0) {
+				Graph* null_graph = NULL;
+				battery_vertices_quant = remove_vertex(&null_graph, battery_vertices[shortest_position], battery_vertices, battery_vertices_quant);
+			}
+		}
+		else strcpy(start, path[path_pos - 1]); // Update the start vertex
+
+		// Go to the start in the end
+		if (battery_vertices_quant == 0 && strcmp(path[path_pos - 1], path[0]) != 0) {
+			battery_vertices_quant = 1;
+			battery_vertices[0] = create_vertex(path[0]);
 		}
 	}
 

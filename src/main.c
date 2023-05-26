@@ -369,13 +369,31 @@ int main() {
 
 
 	char* start_vertex = (char*)malloc(MAX_LINE_LENGTH / 3 * sizeof(char));
-	strcpy(start_vertex, "latoes.matos.sacos");
+	strcpy(start_vertex, "babado.velhas.prego");
 
 	int circuit_size = 0;
-	char** circuit = shortest_circuit(loaded_graph, loaded_vertices, vertices_size, start_vertex, 0, &circuit_size);
+	char** circuit = shortest_circuit(loaded_graph, loaded_vertices, vertices_size, start_vertex, 4, &circuit_size);
 	for (int i = 0; i < circuit_size; i++) {
 		printf("%s -> ", circuit[i]);
 	}
+
+	/*for (int i = 0; i < vertices_size; i++) {
+		for (int j = 0; j < vertices_size; j++) {
+
+			int path_size = 2;
+			int path_pos = 0;
+			char** path = (char*)malloc(path_size * sizeof(char));
+			float test = shortest_path(loaded_graph, &path, loaded_vertices[i]->geocode, loaded_vertices[j]->geocode, vertices_size, &path_size, &path_pos);
+			for (int h = 0; h < path_size - 1; h++) {
+				printf("%s -> ", path[h]);
+			}
+			printf("\n%.2f\n", test);
+
+			for (int h = 0; h < path_size - 1; h++) {
+				free(path[h]);
+			}
+		}
+	}*/
 
 	/*
 
