@@ -45,6 +45,7 @@ void save_transport(Transport* current, int id, int battery, int autonomy, float
 	current->id = id;
 	current->battery = battery;
 	current->autonomy = autonomy;
+	current->rented = 0;
 	current->price = price;
 	current->volume = volume;
 
@@ -241,7 +242,7 @@ int remove_transport(Transport** head, int id) {
 	Transport* current = *head;
 
 	// Remove the first node
-	if (current->id == id && current != NULL) {
+	if (current->id == id && current != NULL && current->rented != 1) {
 		*head = current->next;
 		free(current);
 		return 1;
@@ -254,7 +255,7 @@ int remove_transport(Transport** head, int id) {
 		previous = current;
 		current = current->next;
 
-		if (current->id == id) {
+		if (current->id == id && current->rented != 1) {
 			if (current->next != NULL) previous->next = current->next;
 			else previous->next = NULL;
 

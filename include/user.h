@@ -160,7 +160,7 @@ int get_user_type(User* head, int id);
  * @param head A lista ligada a ser percorrida.
  * @param id O código unico do utilizador.
  *
- * @return Um apontador para o utilizador com o código unico, se  o código não tiver utilizador correspondente é devolvido NULL.
+ * @return Um apontador para o utilizador com o código unico, se o código não tiver utilizador correspondente é devolvido NULL.
  */
 User* get_user(User* head, int id);
 

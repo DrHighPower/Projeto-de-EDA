@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <time.h>
 
 #include "../include/additional_functions.h"
 #include "../include/user.h"
@@ -129,7 +130,7 @@ void manager_menu(User* loaded_users, Transport* loaded_transport, Graph* loaded
 					scanf("%d", &remove_transpot_id);
 					getchar();
 
-					remove_transport(&loaded_transport, remove_transpot_id);
+					if (!remove_transport(&loaded_transport, remove_transpot_id)) printf("Ocorreu algum erro ao eliminar o meio de tranporte!");
 				}
 				break;
 			case 6:
@@ -445,6 +446,9 @@ int main() {
 
 	loaded_graph = read_graph(loaded_graph, loaded_vertices, vertices_size, 0);
 
+	// Stores the rental process
+	Rental* rented = NULL;
+
 	do{
 		// Print menu
 		printf("\nMenu:\n");
@@ -452,13 +456,14 @@ int main() {
 		printf("2. Listagem dos meios de mobilidade num geocódigo\n");
 		printf("3. Editar dados do utilizador\n");
 		printf("4. Alugar um meio de transporte\n");
-		printf("5. Adicionar saldo\n");
-		printf("6. Meios de transporte num raio\n");
+		printf("5. Párar de alugar um meio de transporte\n");
+		printf("6. Adicionar saldo\n");
+		printf("7. Meios de transporte num raio\n");
 
 		// Check if the user is a manager
-		if (user_type) printf("8. Menu de gestores\n");
+		if (user_type) printf("9. Menu de gestores\n");
 
-		printf("7. Sair\n");
+		printf("8. Sair\n");
 		printf("_________________________________\n");
 		printf("Insira a sua escolha: ");
 
@@ -522,22 +527,55 @@ int main() {
 			case 4:
 				{ // Use of curly brackets because you can't declare a variable inside a case statement
 					
-					// Store the transport id
-					int transport_id = 0;
+					int transport_id = 0; // Store the transport id
+					char choise;		  // Stores the user's choice
+
+					// Check if the user is already renting a transport
+					if (rented != NULL) {
+						printf("Já está a alugar um meio de transporte, quer continuar? (S/N)\n");
+						scanf("%c", &choise);
+						getchar();
+
+						if (choise == 'N' || choise == 'n') break;
+						
+						stop_rental(&rented, loaded_users, loaded_transports, 0);
+					}
 
 					// Get user's input
 					printf("O id do meio de tranporte que quer alugar: ");
 					scanf("%d", &transport_id);
 					getchar();
 
-					if (get_transport(loaded_transports, transport_id) != NULL) store_rental(&loaded_users, loaded_transports, id, transport_id, 0);
-					else printf("Meio de tranporte não encontrado.\n");
+					// Get the transport to be rented
+					Transport* to_rent = get_transport(loaded_transports, transport_id);
+					if (to_rent == NULL) {
+						printf("O meio de transporte não foi encontrado.");
+						break;
+					}
+
+					// Get user's choice
+					printf("\nPreço por minuto: %.2f\n", to_rent->price);
+					printf("Quer continuar o processo de aluguer? (S/N)\n");
+					scanf("%c", &choise);
+					getchar();
+
+					if (choise == 'N' || choise == 'n') break;
+
+					if (!check_rental(loaded_transports, transport_id)) {
+						rented = start_rental(get_user(loaded_users, id), to_rent);
+						printf("O meio de transporte foi alugado.");
+					}
+					else printf("O meio de transporte já está a ser alugado.");
 				}
 				break;
 			case 5:
-				add_balance(&loaded_users, id, 0);
+				if(stop_rental(&rented, loaded_users, loaded_transports, 0)) printf("O meio de transporte parou de ser alugado.");
+				else printf("Ocorreu um erro a parar de alugar");
 				break;
 			case 6:
+				add_balance(&loaded_users, id, 0);
+				break;
+			case 7:
 				{
 					float searched_radius = 0;				 // Stores the radius the user will search for transports
 					char searched_type[MAX_LINE_LENGTH / 3]; // Stores the transport type searched
@@ -575,9 +613,9 @@ int main() {
 					if (!has_transport) printf("Nenhum transporte foi encontrado.\n");
 				}
 				break;
-			case 7:
-				break;
 			case 8:
+				break;
+			case 9:
 				if (user_type) {
 					manager_menu(loaded_users, loaded_transports, loaded_graph, &loaded_vertices, &vertices_size);
 					break;
@@ -587,7 +625,27 @@ int main() {
 				printf("Escolha invalida!\n");
 		}
 
-	} while (choice != 7);
+		// Check if the user still has money to continue renting the transport
+		if (rented != NULL) {
+			User* current_user = get_user(loaded_users, id);
+			Transport* rented_transport = get_transport(loaded_transports, rented->transport_id);
+
+			// Stores the current time
+			time_t current_time;
+			time(&current_time);
+
+			// Get the minutes
+			int minutes_passed = (current_time - rented->start_time) / 60;
+			if (minutes_passed < 1) minutes_passed = 1;
+
+			// Check users money
+			if (current_user->balance < rented_transport->price * minutes_passed) {
+				stop_rental(&rented, loaded_users, loaded_transports, 0);
+				printf("O aluguer do transporte acabou!\n");
+			}
+		}
+
+	} while (choice != 8);
 
 	return 0;
 }

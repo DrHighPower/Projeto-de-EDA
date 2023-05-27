@@ -16,7 +16,8 @@
 typedef struct transportInformation {
 	int id,								/**< O código unico de cada meio de transporte. */
 		battery,						/**< A bateria do meio de transporte. */
-		autonomy;						/**< A autonomia do meio de transporte. */
+		autonomy,						/**< A autonomia do meio de transporte. */
+		rented;							/**< Indica se o transporte está alugado. */
 	float price,						/**< O preço do meio de transporte. */
 		  volume;						/**< O volume do meio de transporte em metros cúbicos. */
 	char *type,							/**< O tipo do meio de transporte. */
