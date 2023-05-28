@@ -367,7 +367,7 @@ void manager_menu(User* loaded_users, Transport* loaded_transport, Graph* loaded
 				printf("Escolha invalida!\n\n");
 		}
 
-	} while (choice != 16);
+	} while (choice != 17);
 }
 #pragma endregion
 
