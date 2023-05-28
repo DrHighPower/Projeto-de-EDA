@@ -1099,13 +1099,22 @@ Vertex** reduced_battery(Vertex** vertices, int vertices_quant, int* new_vertice
 				// Allocate memory for the new vertex
 				new_vertices[new_vertices_pos] = (Vertex*)malloc(sizeof(Vertex));
 
+				// Copy the vertex data
+				memcpy(new_vertices[new_vertices_pos], vertices[i], sizeof(Vertex));
+
+				// Allocate memory for the new vertex's transports
+				new_vertices[new_vertices_pos]->transports = malloc(vertices[i]->transport_quantity * sizeof(Transport*));
+
+				// Copy the transports
+				for (int k = 0; k < vertices[i]->transport_quantity; k++) {
+					new_vertices[new_vertices_pos]->transports[k] = malloc(sizeof(Transport));
+					memcpy(new_vertices[new_vertices_pos]->transports[k], vertices[i]->transports[k], sizeof(Transport));
+				}
+
 				// Reallocate memory for the array of vertices
+				new_vertices_pos++;
 				*new_vertices_size = *new_vertices_size + 1;
 				new_vertices = (Vertex**)realloc(new_vertices, *new_vertices_size * sizeof(Vertex*));
-
-				// Copy the vertices
-				memcpy(new_vertices[new_vertices_pos], vertices[i], sizeof(Vertex));
-				new_vertices_pos++;
 
 				break;
 			}
